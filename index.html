@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Intent Guard — PayPal EU | Vidhi Gupta</title>
+<meta name="description" content="A product case study on Intent Guard — an AI-powered commercial intent classifier for PayPal's Friends & Family payments in the EU market." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  /* ── Reset & Base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a0f;
+    color: #e8eaf0;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Design tokens ────────────────────────────────────────── */
+  :root {
+    --pp-navy:    #003087;
+    --pp-blue:    #0070BA;
+    --pp-light:   #009cde;
+    --pp-gold:    #ffc439;
+    --bg-dark:    #0a0a0f;
+    --bg-card:    #13131a;
+    --bg-card2:   #1a1a24;
+    --border:     rgba(255,255,255,0.08);
+    --text-dim:   #8b8fa8;
+    --text-mid:   #b0b3c6;
+    --text-light: #e8eaf0;
+    --green:      #00c46a;
+    --amber:      #f59e0b;
+    --red:        #ef4444;
+    --radius-lg:  16px;
+    --radius-md:  10px;
+    --radius-sm:  6px;
+  }
+
+  /* ── Utility ──────────────────────────────────────────────── */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .container--wide { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 96px 0; }
+  .section--sm { padding: 64px 0; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 50px;
+    background: rgba(0,112,186,0.15);
+    color: var(--pp-light);
+    border: 1px solid rgba(0,112,186,0.3);
+    margin-bottom: 20px;
+  }
+  .tag--amber { background: rgba(245,158,11,0.12); color: var(--amber); border-color: rgba(245,158,11,0.25); }
+  .tag--green { background: rgba(0,196,106,0.12); color: var(--green); border-color: rgba(0,196,106,0.25); }
+  .tag--red   { background: rgba(239,68,68,0.12);  color: var(--red);   border-color: rgba(239,68,68,0.25); }
+
+  h1 { font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.1; letter-spacing: -0.03em; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 16px; }
+  h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+  p  { color: var(--text-mid); line-height: 1.75; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #009cde 0%, #0070BA 50%, var(--pp-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Nav ──────────────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 15px; color: var(--text-light);
+    text-decoration: none;
+  }
+  .nav-logo-pp {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--pp-navy), var(--pp-blue));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: white;
+  }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a { font-size: 13px; font-weight: 500; color: var(--text-dim); text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--text-light); }
+  .nav-cta {
+    font-size: 13px; font-weight: 600; padding: 8px 18px;
+    background: var(--pp-blue); color: white; border-radius: 50px;
+    text-decoration: none; transition: background .2s;
+  }
+  .nav-cta:hover { background: var(--pp-light); }
+
+  /* ── Hero ─────────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 24px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 40%, rgba(0,48,135,0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 60%, rgba(0,112,186,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 30% at 50% 10%, rgba(255,196,57,0.08) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.03;
+    background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 820px; }
+  .hero-meta {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    font-size: 12px; font-weight: 600; color: var(--text-dim);
+    padding: 5px 12px; border-radius: 50px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+  }
+  .hero h1 { margin-bottom: 24px; }
+  .hero-subtitle {
+    font-size: 1.15rem; color: var(--text-mid);
+    max-width: 640px; margin-bottom: 40px; line-height: 1.7;
+  }
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 50px;
+    background: var(--pp-blue); color: white;
+    font-size: 15px; font-weight: 700;
+    text-decoration: none; transition: all .2s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--pp-light); transform: translateY(-1px); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 50px;
+    background: transparent; color: var(--text-light);
+    font-size: 15px; font-weight: 600;
+    text-decoration: none; transition: all .2s;
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+
+  .hero-stats {
+    display: flex; gap: 40px; margin-top: 64px;
+    padding-top: 40px; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .hero-stat-num { font-size: 2rem; font-weight: 900; color: var(--text-light); }
+  .hero-stat-label { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── Section titles ───────────────────────────────────────── */
+  .section-header { margin-bottom: 48px; }
+  .section-header p { margin-top: 12px; max-width: 580px; font-size: 1.05rem; }
+
+  /* ── Cards ────────────────────────────────────────────────── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+  }
+  .card--highlight {
+    background: linear-gradient(135deg, rgba(0,48,135,0.25) 0%, rgba(0,112,186,0.15) 100%);
+    border-color: rgba(0,112,186,0.3);
+  }
+  .card--amber {
+    background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(245,158,11,0.05) 100%);
+    border-color: rgba(245,158,11,0.2);
+  }
+  .card--green {
+    background: linear-gradient(135deg, rgba(0,196,106,0.1) 0%, rgba(0,196,106,0.05) 100%);
+    border-color: rgba(0,196,106,0.2);
+  }
+
+  /* ── Problem section ──────────────────────────────────────── */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:640px){ .problem-grid { grid-template-columns: 1fr; } }
+
+  .signal-card { padding: 24px; }
+  .signal-verdict {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 50px; margin-top: 14px;
+  }
+  .verdict-strong { background: rgba(0,196,106,0.15); color: var(--green); border: 1px solid rgba(0,196,106,0.3); }
+  .verdict-val    { background: rgba(0,156,222,0.15); color: var(--pp-light); border: 1px solid rgba(0,156,222,0.3); }
+  .verdict-sup    { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+
+  /* ── Reframe section ──────────────────────────────────────── */
+  .reframe-split {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px;
+  }
+  @media(max-width:640px){ .reframe-split { grid-template-columns: 1fr; } }
+  .reframe-col { padding: 28px; border-radius: var(--radius-lg); }
+  .reframe-col--existing {
+    background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2);
+  }
+  .reframe-col--new {
+    background: rgba(0,196,106,0.07); border: 1px solid rgba(0,196,106,0.2);
+  }
+  .reframe-col h3 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .reframe-col--existing h3 { color: var(--red); }
+  .reframe-col--new h3      { color: var(--green); }
+  .reframe-item { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+  .reframe-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px;
+  }
+  .dot-red   { background: var(--red); }
+  .dot-green { background: var(--green); }
+  .reframe-item p { font-size: 14px; line-height: 1.6; color: var(--text-mid); }
+
+  .reframe-quote {
+    padding: 28px 32px;
+    background: linear-gradient(135deg, rgba(0,48,135,0.3), rgba(0,112,186,0.2));
+    border: 1px solid rgba(0,112,186,0.35);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+  .reframe-quote .quote-text {
+    font-size: 1.3rem; font-weight: 700; color: var(--text-light); line-height: 1.4;
+    font-style: italic;
+  }
+  .reframe-quote .quote-sub { margin-top: 10px; font-size: 13px; color: var(--text-dim); }
+
+  /* ── Personas ─────────────────────────────────────────────── */
+  .personas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:640px){ .personas-grid { grid-template-columns: 1fr; } }
+  .persona-card { padding: 28px; }
+  .persona-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: white; margin-bottom: 16px;
+  }
+  .persona-quote {
+    margin: 16px 0;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--pp-blue);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 14px; font-style: italic; color: var(--text-mid); line-height: 1.6;
+  }
+  .persona-jtbd {
+    font-size: 13px; color: var(--text-dim); line-height: 1.6;
+    padding: 12px 14px; background: rgba(255,255,255,0.03);
+    border-radius: var(--radius-sm); margin-top: 10px;
+  }
+  .persona-jtbd strong { color: var(--pp-light); font-weight: 600; }
+
+  /* ── Competitive ──────────────────────────────────────────── */
+  .comp-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .comp-table th {
+    text-align: left; padding: 12px 16px; font-size: 12px;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-dim); border-bottom: 1px solid var(--border);
+  }
+  .comp-table td {
+    padding: 14px 16px; font-size: 14px; color: var(--text-mid);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr.paypal-row td { color: var(--text-light); background: rgba(0,112,186,0.06); }
+  .comp-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; padding: 3px 10px;
+    border-radius: 50px;
+  }
+  .badge-red   { background: rgba(239,68,68,0.12);  color: var(--red);   border: 1px solid rgba(239,68,68,0.2); }
+  .badge-green { background: rgba(0,196,106,0.12);  color: var(--green); border: 1px solid rgba(0,196,106,0.2); }
+  .badge-amber { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+
+  /* ── Solution ─────────────────────────────────────────────── */
+  .solution-hero {
+    padding: 48px;
+    background: linear-gradient(135deg, rgba(0,48,135,0.4) 0%, rgba(0,112,186,0.25) 100%);
+    border: 1px solid rgba(0,112,186,0.4);
+    border-radius: var(--radius-lg);
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .solution-hero h2 { font-size: 2rem; margin-bottom: 12px; }
+  .solution-hero p  { max-width: 580px; margin: 0 auto; font-size: 1.05rem; }
+
+  .signals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 24px; }
+  .signal-item {
+    padding: 16px 18px;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .signal-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(0,112,186,0.2); display: flex; align-items: center;
+    justify-content: center; font-size: 15px;
+  }
+  .signal-item h4 { font-size: 13px; font-weight: 700; color: var(--text-light); margin-bottom: 3px; }
+  .signal-item p  { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  /* ── Flow ─────────────────────────────────────────────────── */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-num {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+    background: rgba(0,112,186,0.2); color: var(--pp-light);
+    border: 1px solid rgba(0,112,186,0.3);
+  }
+  .flow-num--key {
+    background: linear-gradient(135deg, var(--pp-navy), var(--pp-blue));
+    color: white; border-color: var(--pp-blue);
+    box-shadow: 0 0 0 4px rgba(0,112,186,0.15);
+  }
+  .flow-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text-light); }
+  .flow-content p  { font-size: 14px; color: var(--text-dim); }
+  .flow-branch {
+    margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  @media(max-width:500px){ .flow-branch { grid-template-columns: 1fr; } }
+  .flow-branch-item {
+    padding: 14px; border-radius: var(--radius-md);
+    font-size: 13px; line-height: 1.5;
+  }
+  .branch-protect {
+    background: rgba(0,196,106,0.08); border: 1px solid rgba(0,196,106,0.2); color: var(--green);
+  }
+  .branch-ff {
+    background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--amber);
+  }
+
+  /* ── Prototype ────────────────────────────────────────────── */
+  .prototype-section {
+    background: linear-gradient(180deg, rgba(0,48,135,0.15) 0%, transparent 100%);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 80px 0;
+  }
+  .prototype-frame {
+    display: flex; justify-content: center; margin-top: 40px;
+  }
+  .phone-frame {
+    width: 375px; height: 720px;
+    border-radius: 40px;
+    overflow: hidden;
+    border: 8px solid #1e1e2e;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+  }
+  .phone-frame iframe { width: 100%; height: 100%; border: none; }
+  .phone-notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 28px; background: #1e1e2e; border-radius: 0 0 20px 20px;
+    z-index: 10;
+  }
+
+  /* ── Metrics ──────────────────────────────────────────────── */
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:640px){ .metrics-grid { grid-template-columns: 1fr; } }
+  .metric-card { padding: 24px; }
+  .metric-type {
+    font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .type-key      { color: var(--pp-light); }
+  .type-sec      { color: var(--amber); }
+  .type-guard    { color: var(--red); }
+  .metric-value  { font-size: 1.8rem; font-weight: 900; color: var(--text-light); line-height: 1; margin-bottom: 4px; }
+  .metric-label  { font-size: 13px; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
+  .metric-desc   { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  /* ── Pre-mortem ───────────────────────────────────────────── */
+  .premortem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media(max-width:768px){ .premortem-grid { grid-template-columns: 1fr; } }
+  .pm-card { padding: 24px; }
+  .pm-type {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .pm-tiger  { color: var(--red); }
+  .pm-eleph  { color: var(--amber); }
+  .pm-paper  { color: var(--green); }
+  .pm-card h3 { font-size: 14px; color: var(--text-light); margin-bottom: 10px; }
+  .pm-card p  { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+  .pm-signal {
+    margin-top: 14px; padding: 10px 12px;
+    background: rgba(255,255,255,0.03); border-radius: var(--radius-sm);
+    font-size: 12px; color: var(--text-dim);
+  }
+  .pm-signal strong { color: var(--text-mid); font-weight: 600; }
+
+  /* ── RICE table ───────────────────────────────────────────── */
+  .rice-table { width: 100%; border-collapse: collapse; }
+  .rice-table th {
+    text-align: left; padding: 12px 16px; font-size: 11px;
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-dim); border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .rice-table td {
+    padding: 13px 16px; font-size: 13px; color: var(--text-mid);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .rice-table tr.build1 td { background: rgba(0,112,186,0.06); color: var(--text-light); }
+  .rice-table tr.build1 td:first-child { color: var(--pp-light); font-weight: 700; }
+  .rice-score { font-weight: 800; color: var(--text-light); }
+
+  /* ── Author / Footer ──────────────────────────────────────── */
+  .author-section {
+    padding: 80px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .author-avatar {
+    width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px;
+    background: linear-gradient(135deg, var(--pp-navy), var(--pp-blue));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 900; color: white;
+  }
+  .author-section h2 { font-size: 1.5rem; margin-bottom: 8px; }
+  .author-section p  { max-width: 440px; margin: 0 auto 28px; }
+  .author-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+  footer {
+    padding: 24px; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-dim);
+  }
+
+  /* ── Divider ──────────────────────────────────────────────── */
+  .divider {
+    height: 1px; background: var(--border); margin: 0;
+  }
+
+  /* ── PIF row ──────────────────────────────────────────────── */
+  .pif-row { display: flex; gap: 16px; margin-top: 32px; flex-wrap: wrap; }
+  .pif-block {
+    flex: 1; min-width: 160px;
+    padding: 24px; text-align: center;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .pif-score { font-size: 3rem; font-weight: 900; color: var(--pp-light); line-height: 1; }
+  .pif-dim   { font-size: 13px; font-weight: 700; color: var(--text-light); margin-top: 6px; }
+  .pif-reason{ font-size: 12px; color: var(--text-dim); margin-top: 4px; line-height: 1.5; }
+  .pif-total {
+    flex: 1; min-width: 160px;
+    padding: 24px; text-align: center;
+    background: linear-gradient(135deg, rgba(0,48,135,0.4), rgba(0,112,186,0.25));
+    border: 2px solid var(--pp-blue);
+    border-radius: var(--radius-lg);
+  }
+  .pif-total .pif-score { font-size: 3.5rem; color: white; }
+  .pif-total .pif-dim   { color: var(--pp-gold); }
+
+  /* ── Validate-next ────────────────────────────────────────── */
+  .validate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+  @media(max-width:640px){ .validate-grid { grid-template-columns: 1fr; } }
+  .validate-card { padding: 22px; }
+  .validate-num  { font-size: 1.5rem; font-weight: 900; color: var(--pp-light); margin-bottom: 8px; }
+  .validate-card h4 { font-size: 14px; font-weight: 700; color: var(--text-light); margin-bottom: 6px; }
+  .validate-card p  { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── Scroll fade-in ───────────────────────────────────────── */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Mobile ───────────────────────────────────────────────── */
+  @media(max-width:768px){
+    .nav-links { display: none; }
+    .section { padding: 64px 0; }
+    .hero { padding: 100px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ───────────────────────────────────────────────────── -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-pp">PP</div>
+    Intent Guard
+  </a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#reframe">Reframe</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#prototype">Prototype</a></li>
+    <li><a href="#metrics">Metrics</a></li>
+  </ul>
+  <a class="nav-cta" href="#prototype">View Prototype →</a>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-meta">
+      <span class="hero-meta-item">PayPal · EU Market</span>
+      <span class="hero-meta-item">AI-Powered Feature</span>
+      <span class="hero-meta-item">May 2026</span>
+      <span class="hero-meta-item">HelloPM · Assignment 2</span>
+    </div>
+    <h1>PayPal built a<br><span class="gradient-text">fraud detector.</span><br>The problem needs a<br><span class="gradient-text">commercial intent classifier.</span></h1>
+    <p class="hero-subtitle">
+      EU users are losing buyer protection on marketplace purchases because PayPal's Friends &amp; Family option relies entirely on user self-classification. Intent Guard fixes the architecture — not just the warning.
+    </p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#prototype">See the prototype →</a>
+      <a class="btn-secondary" href="#problem">Read the case study</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">€750M+</div>
+        <div class="hero-stat-label">Estimated annual revenue at risk from TPA decline</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">46M</div>
+        <div class="hero-stat-label">Wero users in Europe — PayPal's rising competitor</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">15/15</div>
+        <div class="hero-stat-label">PIF score — maximum P0 priority</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">€0</div>
+        <div class="hero-stat-label">User recourse after an F&amp;F commercial transaction loss</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Problem Discovery ──────────────────────────────────────── -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">Problem Discovery</div>
+      <h2>The invisible drain on PayPal's most important market</h2>
+      <p>Six secondary research signals — all pointing to the same structural gap that doesn't show up in dispute data.</p>
+    </div>
+
+    <div class="problem-grid">
+
+      <div class="card signal-card fade-in">
+        <div class="tag tag--amber">Signal A</div>
+        <h3>Verbraucherzentrale Warnings</h3>
+        <p style="font-size:14px">Three independent branches of Germany's primary consumer protection authority (25M+ annual contacts) published specific advisories on F&amp;F misuse. NRW, Niedersachsen, and national level — all independently identifying the same complaint cluster from Kleinanzeigen, Vinted, and Facebook Marketplace users.</p>
+        <span class="signal-verdict verdict-val">Validated</span>
+      </div>
+
+      <div class="card signal-card fade-in">
+        <div class="tag">Signal B — Critical</div>
+        <h3>PayPal shipped a feature. It's not enough.</h3>
+        <p style="font-size:14px">PayPal launched AI scam detection for F&amp;F in July 2025 — confirming scale. But it targets fraud patterns (social media scams, urgency tactics). It does <em>not</em> reclassify transactions. A legitimate Kleinanzeigen seller with 50+ reviews requesting F&amp;F passes scam detection. The buyer still has zero protection. <strong style="color:var(--text-light)">Warning ≠ protection.</strong></p>
+        <span class="signal-verdict verdict-strong">Strongly Validates Gap</span>
+      </div>
+
+      <div class="card signal-card fade-in">
+        <div class="tag tag--amber">Signal C</div>
+        <h3>TPA down 4–6% across Q2–Q4 2025</h3>
+        <p style="font-size:14px">PayPal's Transaction Per Active Account declined consecutively for three quarters — 4%, 6%, 5%. Accounts are retained. Habits are migrating. Users who lose €300 on a Kleinanzeigen purchase don't delete PayPal. They just never use it for marketplace transactions again. Zero complaints filed. Zero signals in dispute data.</p>
+        <span class="signal-verdict verdict-sup">Supports Business Impact</span>
+      </div>
+
+      <div class="card signal-card fade-in">
+        <div class="tag">Signal D</div>
+        <h3>Wero: 46M users, Germany e-commerce Nov 2025</h3>
+        <p style="font-size:14px">Sixteen major European banks launched Wero to reclaim P2P payment rails. It reached 46M users in year one and launched e-commerce in Germany in November 2025. Every unresolved F&amp;F loss makes the Wero switch permanently easier. The threat is not enterprise merchants — it's the casual German consumer with a barely-used PayPal account.</p>
+        <span class="signal-verdict verdict-sup">Supports Strategic Urgency</span>
+      </div>
+
+      <div class="card signal-card fade-in">
+        <div class="tag tag--amber">Signal E</div>
+        <h3>Documented loss: €2,970 — zero recourse</h3>
+        <p style="font-size:14px">Verbraucherzentrale Niedersachsen published a specific case where a user lost €2,970 via an F&amp;F transaction and had no recovery path through PayPal. Used as a public warning example — indicating it was representative, not exceptional. Irrevocable. No dispute path available.</p>
+        <span class="signal-verdict verdict-val">Validates Intensity = 5</span>
+      </div>
+
+      <div class="card signal-card fade-in">
+        <div class="tag">Signal F</div>
+        <h3>Kleinanzeigen: structurally embedded pattern</h3>
+        <p style="font-size:14px">PayPal's own German help page addresses F&amp;F scams on Kleinanzeigen. The platform has 32M monthly German users. F&amp;F requests in C2C transactions are so common that PayPal DE published a dedicated advisory. This is not an edge case — it is the default marketplace payment behaviour in Germany.</p>
+        <span class="signal-verdict verdict-val">Validates Population = 5</span>
+      </div>
+
+    </div>
+
+    <!-- PIF -->
+    <div class="fade-in" style="margin-top: 48px;">
+      <div class="tag tag--green">PIF Prioritisation</div>
+      <h2>P0 Score: 5 × 5 × 4 = 20</h2>
+      <div class="pif-row">
+        <div class="pif-block">
+          <div class="pif-score">5</div>
+          <div class="pif-dim">Population</div>
+          <div class="pif-reason">32M monthly Kleinanzeigen users in Germany alone. F&amp;F is systematically requested across all major C2C platforms.</div>
+        </div>
+        <div class="pif-block">
+          <div class="pif-score">5</div>
+          <div class="pif-dim">Intensity</div>
+          <div class="pif-reason">When F&amp;F loss occurs, the outcome is complete and irrevocable. No dispute path. No escalation. Zero.</div>
+        </div>
+        <div class="pif-block">
+          <div class="pif-score">4</div>
+          <div class="pif-dim">Frequency</div>
+          <div class="pif-reason">Every C2C marketplace session where a seller requests F&amp;F. The structural exposure is constant even when no loss materialises.</div>
+        </div>
+        <div class="pif-total">
+          <div class="pif-score">P0</div>
+          <div class="pif-dim">Maximum Priority</div>
+          <div class="pif-reason" style="color: rgba(255,255,255,0.6)">Strongest evidence across all research signals. Most proximate cause of trust destruction. Architecturally unsolved by PayPal's existing feature.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Reframe ────────────────────────────────────────────────── -->
+<section class="section" id="reframe">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">Critical Reframe</div>
+      <h2>Why this isn't already solved</h2>
+      <p>PayPal shipped an AI feature for F&amp;F in July 2025. Here is exactly why it does not address this problem — and why that distinction matters.</p>
+    </div>
+
+    <div class="reframe-split fade-in">
+      <div class="reframe-col reframe-col--existing">
+        <h3>PayPal July 2025 — Fraud Classifier</h3>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-red"></div>
+          <p>Asks: <em>"Does this match a known fraud pattern?"</em></p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-red"></div>
+          <p>Targets social media scams, urgency tactics, first-time scammer accounts</p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-red"></div>
+          <p>Outcome when fired: warning + optional blocking</p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-red"></div>
+          <p>Outcome if user dismisses: F&amp;F executes → <strong style="color:var(--red)">zero protection</strong></p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-red"></div>
+          <p>Architectural change to F&amp;F payment type: <strong style="color:var(--red)">None</strong></p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-red"></div>
+          <p>F&amp;F T&amp;C exclusion clause post-July 2025: <strong style="color:var(--red)">Unchanged</strong></p>
+        </div>
+      </div>
+
+      <div class="reframe-col reframe-col--new">
+        <h3>Intent Guard — Commercial Intent Classifier</h3>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-green"></div>
+          <p>Asks: <em>"Does this transaction have commercial intent — regardless of fraud pattern?"</em></p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-green"></div>
+          <p>Targets legitimate C2C marketplace transactions where seller requests F&amp;F for fee avoidance</p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-green"></div>
+          <p>Outcome when fired: reclassification offer — switch to G&amp;S before execution</p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-green"></div>
+          <p>Outcome if user switches: transaction executes <strong style="color:var(--green)">with full Buyer Protection</strong></p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-green"></div>
+          <p>Architectural change: <strong style="color:var(--green)">reclassification path exists for the first time</strong></p>
+        </div>
+        <div class="reframe-item">
+          <div class="reframe-dot dot-green"></div>
+          <p>Intervenes before protection window closes permanently</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="reframe-quote fade-in">
+      <div class="quote-text">"PayPal's feature tells you that you might get scammed.<br>Intent Guard stops the loss from happening by changing what type of transaction you're in."</div>
+      <div class="quote-sub">The scenario PayPal's system cannot catch: a Kleinanzeigen seller with 50+ reviews, 4.8 stars, 2-year account history — requesting F&amp;F to save on fees. No fraud pattern. No alert fires. Zero protection.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Personas ───────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">User Segments</div>
+      <h2>Two sides of the same structural problem</h2>
+      <p>The buyer who loses protection without knowing it — and the seller who enables it without intending to.</p>
+    </div>
+
+    <div class="personas-grid">
+      <div class="card persona-card fade-in">
+        <div class="persona-avatar" style="background: linear-gradient(135deg,#003087,#0070BA)">M</div>
+        <div class="tag">The Trusting Marketplace Buyer</div>
+        <h3>Markus B. — 34, Berlin</h3>
+        <p style="font-size:13px; color:var(--text-dim); margin-bottom:4px">Software developer · Active Kleinanzeigen user · PayPal for "safety"</p>
+        <div class="persona-quote">"I thought PayPal always protected you. That's literally why I used it instead of bank transfer. I didn't know there was a 'safe' mode and an 'unsafe' mode."</div>
+        <div class="persona-jtbd">
+          <strong>JTBD:</strong> When buying from a stranger online, I want assurance my money is safe, so I can transact with confidence rather than anxiety.
+        </div>
+        <p style="font-size:13px; color:var(--text-dim); margin-top:14px; line-height:1.6">His trust destruction doesn't appear in dispute data. It appears in TPA data 90 days later — as a user who still has a PayPal account and never uses it for marketplace purchases again.</p>
+      </div>
+
+      <div class="card persona-card fade-in">
+        <div class="persona-avatar" style="background: linear-gradient(135deg,#1a1a40,#003087)">S</div>
+        <div class="tag tag--amber">The Fee-Avoidance Enabler</div>
+        <h3>Sophia K. — 28, Munich</h3>
+        <p style="font-size:13px; color:var(--text-dim); margin-bottom:4px">Freelance designer · Sells on Vinted &amp; Kleinanzeigen · Standard PayPal account</p>
+        <div class="persona-quote">"I always ask for Friends &amp; Family because that's what other sellers do to avoid the fees. Nobody told me this was risky. The button is right there."</div>
+        <div class="persona-jtbd">
+          <strong>JTBD:</strong> When I sell online, I want to receive the full sale price without deductions, so that selling small items is worth my time.
+        </div>
+        <p style="font-size:13px; color:var(--text-dim); margin-top:14px; line-height:1.6">She is not a fraudster — she is a rational actor using the product as designed. PayPal has historically had no incentive to change her behaviour. F&amp;F is cheaper to process.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Competitive ────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">Competitive Analysis</div>
+      <h2>PayPal is uniquely exposed</h2>
+      <p>Every competitor either has no F&amp;F equivalent or solves the problem by architecture. Only PayPal has both a protected and unprotected type in the same interface.</p>
+    </div>
+
+    <div class="card fade-in" style="padding:0; overflow:hidden;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>F&amp;F / Unprotected Analog</th>
+            <th>Commercial Intent Gap</th>
+            <th>How Resolved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="paypal-row">
+            <td><strong>PayPal</strong></td>
+            <td>F&amp;F explicitly exists — same UI as G&amp;S</td>
+            <td><span class="comp-badge badge-red">❌ Critical gap</span></td>
+            <td>July 2025: fraud alerts only. Reclassification: none.</td>
+          </tr>
+          <tr>
+            <td>Klarna</td>
+            <td>No F&amp;F analog — all payments commercial by default</td>
+            <td><span class="comp-badge badge-green">✅ N/A by design</span></td>
+            <td>Solved architecturally — BNPL/direct debit, all protected</td>
+          </tr>
+          <tr>
+            <td>Trusted Shops</td>
+            <td>No F&amp;F analog — merchant certification layer</td>
+            <td><span class="comp-badge badge-green">✅ N/A</span></td>
+            <td>Payment-method-agnostic protection up to €20K</td>
+          </tr>
+          <tr>
+            <td>Revolut</td>
+            <td>No F&amp;F product — P2P has bank dispute rights</td>
+            <td><span class="comp-badge badge-amber">⚠️ Partial</span></td>
+            <td>Better by default architecture — no binary protected/unprotected</td>
+          </tr>
+          <tr>
+            <td>Credit Cards</td>
+            <td>No F&amp;F analog — all transactions have chargeback rights</td>
+            <td><span class="comp-badge badge-green">✅ N/A by design</span></td>
+            <td>Section 75 / EU card directive: universal protection</td>
+          </tr>
+          <tr>
+            <td>Wero</td>
+            <td>Bank account-to-account — SEPA dispute rights by default</td>
+            <td><span class="comp-badge badge-amber">⚠️ Partial</span></td>
+            <td>Bank-level regulation applies; no buyer protection product</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card card--highlight fade-in" style="margin-top:20px; padding:24px 28px;">
+      <h3 style="color:var(--pp-light); margin-bottom:8px">The key insight</h3>
+      <p style="font-size:15px">PayPal is the <strong style="color:var(--text-light)">only</strong> major payment platform that has both a protected payment type (G&amp;S) and an unprotected payment type (F&amp;F) in the same interface — with user self-classification as the sole gating mechanism and no behavioural inference layer. Every competitor either has no F&amp;F equivalent or solves it by design. PayPal is uniquely exposed because of its own product architecture.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Solution ───────────────────────────────────────────────── -->
+<section class="section" id="solution">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag tag--green">The Solution</div>
+      <h2>Intent Guard</h2>
+      <p>A commercial intent scoring layer applied at F&amp;F initiation — offering reclassification at the one moment it is still reversible.</p>
+    </div>
+
+    <div class="solution-hero fade-in">
+      <h2>The AI forcing question</h2>
+      <p>What does AI do here that a rule-based system cannot? A rule-based system (IF memo contains "MacBook" AND first-time recipient → warn) fails in both directions: too broad creates noise, too narrow misses the cases. Commercial intent lives in the weighted combination of many weak signals — updated by account history, context, and recipient patterns. That requires ML, not rules.</p>
+    </div>
+
+    <div class="fade-in">
+      <h3 style="margin-bottom:4px; font-size:1rem; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:.08em">7-Signal Model</h3>
+      <div class="signals-grid">
+        <div class="signal-item">
+          <div class="signal-icon">📝</div>
+          <div>
+            <h4>Memo Language NLP</h4>
+            <p>Item-descriptive text in DE/EN/FR — "MacBook", "Fahrrad", "Sofa", "Verkauf"</p>
+          </div>
+        </div>
+        <div class="signal-item">
+          <div class="signal-icon">🔗</div>
+          <div>
+            <h4>Referrer Context</h4>
+            <p>Navigation from Kleinanzeigen, Vinted, or Facebook Marketplace domain</p>
+          </div>
+        </div>
+        <div class="signal-item">
+          <div class="signal-icon">👤</div>
+          <div>
+            <h4>Recipient History</h4>
+            <p>Fewer than 3 prior transactions with this recipient — weak alone, strong in combination</p>
+          </div>
+        </div>
+        <div class="signal-item">
+          <div class="signal-icon">💶</div>
+          <div>
+            <h4>Amount vs. Baseline</h4>
+            <p>Transaction amount significantly above sender's typical F&amp;F pattern</p>
+          </div>
+        </div>
+        <div class="signal-item">
+          <div class="signal-icon">🕐</div>
+          <div>
+            <h4>Time Pattern</h4>
+            <p>Weekday daytime = C2C marketplace activity peak. Weak signal; contributes calibration.</p>
+          </div>
+        </div>
+        <div class="signal-item">
+          <div class="signal-icon">⚖️</div>
+          <div>
+            <h4>G&amp;S / F&amp;F Usage Ratio</h4>
+            <p>Anomalous F&amp;F use for a predominantly G&amp;S sender signals commercial context</p>
+          </div>
+        </div>
+        <div class="signal-item">
+          <div class="signal-icon">🏷️</div>
+          <div>
+            <h4>Recipient Account Signals</h4>
+            <p>Aggregated prior F&amp;F-commercial complaint associations on recipient</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fade-in" style="margin-top:24px; padding:24px 28px;">
+      <h3 style="margin-bottom:14px">Trigger rules — designed to prevent false positives</h3>
+      <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        <div style="flex:1; min-width:200px; padding:14px; background:rgba(255,255,255,0.03); border-radius:var(--radius-md)">
+          <div style="font-size:12px; font-weight:700; color:var(--pp-light); margin-bottom:4px">MINIMUM THRESHOLD</div>
+          <div style="font-size:14px; color:var(--text-mid)">2 elevated signals required to fire. Single signals have catastrophic false positive rates.</div>
+        </div>
+        <div style="flex:1; min-width:200px; padding:14px; background:rgba(255,255,255,0.03); border-radius:var(--radius-md)">
+          <div style="font-size:12px; font-weight:700; color:var(--green); margin-bottom:4px">SUPPRESSION (day-1 guardrail)</div>
+          <div style="font-size:14px; color:var(--text-mid)">&gt;5 prior transactions with same recipient AND &gt;6 months history → never fires. Protects the flatmate-rent use case.</div>
+        </div>
+        <div style="flex:1; min-width:200px; padding:14px; background:rgba(255,255,255,0.03); border-radius:var(--radius-md)">
+          <div style="font-size:12px; font-weight:700; color:var(--amber); margin-bottom:4px">FREQUENCY CAP</div>
+          <div style="font-size:14px; color:var(--text-mid)">Maximum once per 72 hours per user. No alarm fatigue. One well-timed prompt at the highest-leverage moment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── User Flow ───────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">Product Flow</div>
+      <h2>The user journey</h2>
+      <p>From a normal F&amp;F payment initiation — to a reclassification decision — to a protected transaction. One intervention. Two choices. Always user-driven.</p>
+    </div>
+
+    <div class="card fade-in" style="padding:32px 36px;">
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <h4>Open PayPal → Send Money</h4>
+            <p>User enters recipient and €300 amount. Selects Friends &amp; Family.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <h4>Enters memo: "MacBook Pro 2022"</h4>
+            <p>Navigated from Kleinanzeigen. Referrer signal elevated. Memo NLP fires on "MacBook". Two signals — threshold met.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num flow-num--key">3</div>
+          <div class="flow-content">
+            <h4>Intent Guard prompt appears — before execution</h4>
+            <p>Bottom sheet slides up on confirmation screen. User sees: <em>"Buying something? This payment looks like it might be for goods or services. F&amp;F has no buyer protection."</em></p>
+            <p style="margin-top:6px; font-size:13px; color:var(--pp-light)">Primary CTA: "Switch to Goods &amp; Services — get protected" · Subtext: "The seller covers the standard fee"</p>
+            <div class="flow-branch">
+              <div class="flow-branch-item branch-protect">
+                <strong>✅ User switches to G&amp;S</strong><br>Payment type changes → confirmation with Buyer Protection included → executes protected.
+              </div>
+              <div class="flow-branch-item branch-ff">
+                <strong>→ User continues with F&amp;F</strong><br>Subtle reminder shown → F&amp;F executes → user made an active, informed choice.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <h4>Model records outcome signal</h4>
+            <p>Acceptance → positive training signal. Dismissal without subsequent complaint → calibration signal. Both improve future precision.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--highlight fade-in" style="margin-top:20px; padding:22px 28px;">
+      <h3 style="margin-bottom:10px; color:var(--pp-light)">The most important copy in the feature</h3>
+      <p style="font-size:15px">"<strong style="color:var(--text-light)">The seller covers the standard fee.</strong>" — This single line removes the buyer's primary objection to switching to G&amp;S. Without it, users assume they'll pay more. With it, the reclassification offer becomes a pure upside: protection at no extra cost to the buyer.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Prototype ──────────────────────────────────────────────── -->
+<section class="prototype-section" id="prototype">
+  <div class="container">
+    <div class="section-header fade-in" style="text-align:center; margin-bottom:0">
+      <div class="tag" style="margin:0 auto 20px">Live Prototype</div>
+      <h2>See Intent Guard in action</h2>
+      <p style="max-width:480px; margin:12px auto 0">Built on PayPal's real UI design language. Tap through the full flow: payment initiation → Intent Guard prompt → G&amp;S reclassification or F&amp;F continuation.</p>
+    </div>
+
+    <div class="prototype-frame fade-in">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <iframe
+          src="https://paypal-intent-guard-guardian.lovable.app"
+          title="Intent Guard Prototype"
+          loading="lazy"
+          allow="fullscreen"
+        ></iframe>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:24px">
+      <a class="btn-primary" href="https://paypal-intent-guard-guardian.lovable.app" target="_blank" rel="noopener">
+        Open full prototype ↗
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── RICE ───────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">Prioritisation</div>
+      <h2>RICE scoring — 13 solutions evaluated</h2>
+      <p>Every solution brainstormed. Build sequence determined by Reach × Impact × Confidence ÷ Effort.</p>
+    </div>
+
+    <div class="card fade-in" style="padding:0; overflow:hidden;">
+      <table class="rice-table">
+        <thead>
+          <tr>
+            <th>Solution</th>
+            <th>Reach</th>
+            <th>Impact</th>
+            <th>Confidence</th>
+            <th>Effort</th>
+            <th>Score</th>
+            <th>Build</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="build1">
+            <td>Commercial Intent Score + Reclassification Prompt</td>
+            <td>60%</td><td>3</td><td>70%</td><td>8w</td>
+            <td class="rice-score">15.75</td>
+            <td><span class="comp-badge badge-green">Build 1 — Core</span></td>
+          </tr>
+          <tr class="build1">
+            <td>Account History Suppression (guardrail)</td>
+            <td>60%</td><td>2</td><td>85%</td><td>2w</td>
+            <td class="rice-score">51*</td>
+            <td><span class="comp-badge badge-green">Build 1 — Paired</span></td>
+          </tr>
+          <tr>
+            <td>Amount-Tiered Prompt Intensity</td>
+            <td>60%</td><td>2</td><td>80%</td><td>3w</td>
+            <td class="rice-score">32</td>
+            <td><span class="comp-badge badge-amber">Build 2</span></td>
+          </tr>
+          <tr>
+            <td>Memo NLP Signal (S1 input)</td>
+            <td>50%</td><td>2</td><td>65%</td><td>4w</td>
+            <td class="rice-score">16.25</td>
+            <td><span class="comp-badge badge-amber">Build 1 — Signal</span></td>
+          </tr>
+          <tr>
+            <td>Referrer Context Signal</td>
+            <td>40%</td><td>2</td><td>60%</td><td>3w</td>
+            <td class="rice-score">16</td>
+            <td><span class="comp-badge badge-amber">Build 2</span></td>
+          </tr>
+          <tr>
+            <td>Education Card at F&amp;F Selection only</td>
+            <td>80%</td><td>1</td><td>50%</td><td>1w</td>
+            <td class="rice-score">40</td>
+            <td><span class="comp-badge" style="background:rgba(255,255,255,0.05);color:var(--text-dim);border-color:var(--border)">Build 3 / Control Arm</span></td>
+          </tr>
+          <tr>
+            <td>G&amp;S Fee Subsidy for C2C &lt;€500</td>
+            <td>70%</td><td>3</td><td>40%</td><td>12w+</td>
+            <td class="rice-score">7</td>
+            <td><span class="comp-badge" style="background:rgba(255,255,255,0.05);color:var(--text-dim);border-color:var(--border)">Future</span></td>
+          </tr>
+          <tr>
+            <td>Marketplace Partnership API</td>
+            <td>50%</td><td>3</td><td>30%</td><td>20w+</td>
+            <td class="rice-score">2.25</td>
+            <td><span class="comp-badge" style="background:rgba(255,255,255,0.05);color:var(--text-dim);border-color:var(--border)">Future</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px; color:var(--text-dim); margin-top:10px">* Suppression scored as a high-confidence add-on to Build 1 — its effective RICE score as a standalone is as an enabler, not a standalone feature.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Metrics ────────────────────────────────────────────────── -->
+<section class="section" id="metrics">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag tag--green">Success Metrics</div>
+      <h2>If a metric doesn't change a decision, it's not here</h2>
+      <p>Every metric has a definition, a target, and a decision rationale. Guardrails are as important as key metrics.</p>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="card metric-card fade-in">
+        <div class="metric-type type-key">KEY METRIC</div>
+        <div class="metric-value">&gt;25%</div>
+        <div class="metric-label">Commercial F&amp;F Reclassification Rate</div>
+        <div class="metric-desc">% of Intent Guard prompts where user accepts G&amp;S switch. If &lt;15% at 30 days → prompt redesign gate. Pause scaling, test new copy variants before proceeding.</div>
+      </div>
+
+      <div class="card metric-card fade-in">
+        <div class="metric-type type-key">KEY METRIC</div>
+        <div class="metric-value">–30%</div>
+        <div class="metric-label">F&amp;F Scam Loss Rate (exposed vs. control)</div>
+        <div class="metric-desc">% of F&amp;F transactions resulting in scam complaint: prompt-exposed cohort vs. A/B control. 90-day minimum observation window required for statistical significance.</div>
+      </div>
+
+      <div class="card metric-card fade-in">
+        <div class="metric-type type-sec">SECONDARY</div>
+        <div class="metric-value">+15%</div>
+        <div class="metric-label">G&amp;S Volume Growth — C2C Segment</div>
+        <div class="metric-desc">G&amp;S transaction volume from C2C marketplace contexts, 90 days post-launch. Confirms Intent Guard is converting commercial transactions to protected ones — not just generating dismissed warnings.</div>
+      </div>
+
+      <div class="card metric-card fade-in">
+        <div class="metric-type type-sec">SECONDARY</div>
+        <div class="metric-value">↑ with €</div>
+        <div class="metric-label">Prompt Acceptance by Amount Tier</div>
+        <div class="metric-desc">Reclassification acceptance rate segmented by amount (&lt;€50 / €50–€200 / &gt;€200). Validates tiering hypothesis for Build 2 threshold design.</div>
+      </div>
+
+      <div class="card metric-card fade-in" style="border-color:rgba(239,68,68,0.2); background:rgba(239,68,68,0.05)">
+        <div class="metric-type type-guard">GUARDRAIL</div>
+        <div class="metric-value">&lt;5%</div>
+        <div class="metric-label">False Positive Rate on Established Relationships</div>
+        <div class="metric-desc">% of prompts firing on relationships with &gt;5 prior transactions AND &gt;6 months history. Breach triggers immediate rollback. Monitored daily in weeks 1–4.</div>
+      </div>
+
+      <div class="card metric-card fade-in" style="border-color:rgba(239,68,68,0.2); background:rgba(239,68,68,0.05)">
+        <div class="metric-type type-guard">GUARDRAIL</div>
+        <div class="metric-value">&lt;8%</div>
+        <div class="metric-label">Legitimate F&amp;F Abandonment Rate</div>
+        <div class="metric-desc">% of F&amp;F transactions abandoned after prompt with no subsequent G&amp;S completion. Detects whether prompt causes total exit. Transaction loss = net negative for both users and PayPal.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Pre-mortem ─────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag tag--amber">Pre-Mortem</div>
+      <h2>Assume it shipped and failed. What happened?</h2>
+      <p>Tiger / Elephant / Paper Tiger framework. Every risk has a specific failure mode, detection signal, and mitigation.</p>
+    </div>
+
+    <div class="premortem-grid">
+      <div class="card pm-card fade-in">
+        <div class="pm-type pm-tiger">🐯 Tiger — Real problem, will happen</div>
+        <h3>False positive on established relationships</h3>
+        <p>User who pays their flatmate €800/month rent via F&amp;F receives Intent Guard every month. Feels surveilled. Files complaint. Story becomes "PayPal AI interferes with personal payments." German press picks it up.</p>
+        <div class="pm-signal"><strong>Detection:</strong> False positive rate &gt;5% in week 1 → immediate threshold review. Suppression logic is Build 1, not Build 2.</div>
+      </div>
+
+      <div class="card pm-card fade-in">
+        <div class="pm-type pm-tiger">🐯 Tiger — Real problem, manageable</div>
+        <h3>Low reclassification acceptance → feature becomes noise</h3>
+        <p>Intent Guard fires correctly but 90% of users dismiss it. F&amp;F scam rates don't change. The feature is visible but has no effect — education-only interventions in fintech typically achieve 5–15% acceptance without strong framing.</p>
+        <div class="pm-signal"><strong>Detection:</strong> Reclassification rate &lt;15% at 30 days → prompt redesign gate. A/B test 3 copy variants before scaling.</div>
+      </div>
+
+      <div class="card pm-card fade-in">
+        <div class="pm-type pm-eleph">🐘 Elephant — Unspoken risk no one is naming</div>
+        <h3>PayPal has no incentive to reduce F&amp;F volume</h3>
+        <p>Intent Guard increases G&amp;S volume → increases G&amp;S fee revenue. If the feature is perceived as "PayPal using AI to push users onto the fee-bearing type" rather than a protection tool, the German press narrative is toxic. Revenue impact must not be the objective.</p>
+        <div class="pm-signal"><strong>Detection:</strong> A/B data showing conversion lift correlating with revenue, not scam loss reduction → re-examine incentive alignment.</div>
+      </div>
+
+      <div class="card pm-card fade-in">
+        <div class="pm-type pm-paper">✅ Paper Tiger — Overblown concern</div>
+        <h3>"Users will be annoyed by the prompt"</h3>
+        <p>Any additional friction reduces F&amp;F transactions and damages satisfaction. This sounds plausible but is unlikely to be significant. The prompt fires at most once per 72h. It is single-step, non-blocking, and dismissible in one tap. PayPal already shows payment guidance in-flow.</p>
+        <div class="pm-signal"><strong>What to watch:</strong> Dismissal rate &gt;90% AND NPS for exposed users drops — then revisit. But guardrails prevent this from being catastrophic.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Validate next ───────────────────────────────────────────── -->
+<section class="section--sm">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="tag">What I'd Validate Next</div>
+      <h2>Not vague future work — specific questions with specific methods</h2>
+    </div>
+
+    <div class="validate-grid">
+      <div class="card validate-card fade-in">
+        <div class="validate-num">01</div>
+        <h4>Misclassification awareness rate in Germany</h4>
+        <p>Survey 50+ Kleinanzeigen / Vinted users: "Did you know your last F&amp;F marketplace payment had no buyer protection?" Method: Typeform with €5 incentive. &gt;40% "No" validates education as a contributing factor.</p>
+      </div>
+      <div class="card validate-card fade-in">
+        <div class="validate-num">02</div>
+        <h4>A/B prompt copy — 3 variants</h4>
+        <p>Test: (A) "This might be commercial — switch to G&amp;S" vs (B) "Seller covers the fee — get protected" vs (C) "Sending for something you bought? G&amp;S protects you." Run in 5% cohort for 2 weeks. Acceptance rate determines which scales.</p>
+      </div>
+      <div class="card validate-card fade-in">
+        <div class="validate-num">03</div>
+        <h4>Suppression threshold calibration</h4>
+        <p>Analyse anonymised transaction data: distribution of F&amp;F frequency within established relationships (2+ transactions/month, same recipient, &gt;6 months). Determines the suppression threshold — too low suppresses legitimate commercial prompts; too high creates false positive flood.</p>
+      </div>
+      <div class="card validate-card fade-in">
+        <div class="validate-num">04</div>
+        <h4>Intent Guard vs. July 2025 scam alert overlap</h4>
+        <p>For transactions where Intent Guard fires, what % also triggered the July 2025 alert? If overlap &gt;70%, features are solving the same problem — Intent Guard is redundant in the fraud case. If &lt;30%, Intent Guard is genuinely addressing the non-fraud commercial intent gap.</p>
+      </div>
+      <div class="card validate-card fade-in">
+        <div class="validate-num">05</div>
+        <h4>EU fee attribution legal confirmation</h4>
+        <p>Is the G&amp;S fee borne by the seller (not the buyer) in EU PayPal transactions? If yes, the prompt framing "seller covers the fee" is accurate and the buyer's primary objection is removed. If no, the prompt copy must change — this is the single most important legal dependency before Build 1 ships.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Author ─────────────────────────────────────────────────── -->
+<section class="author-section">
+  <div class="container">
+    <div class="author-avatar">V</div>
+    <h2>Vidhi Gupta</h2>
+    <p>Product Manager in training · HelloPM Cohort 50 · This case study is Assignment 2 of the HelloPM programme — an AI-powered feature designed for a real product, grounded in real secondary research.</p>
+    <div class="author-links">
+      <a class="btn-primary" href="https://paypal-intent-guard-guardian.lovable.app" target="_blank" rel="noopener">View Prototype →</a>
+      <a class="btn-secondary" href="https://www.notion.so/361c86e8297081cb99dcd0b8871ded75" target="_blank" rel="noopener">Read the PRD</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    Intent Guard · PayPal EU Case Study · Vidhi Gupta · May 2026 · HelloPM Assignment 2
+  </div>
+</footer>
+
+<script>
+  // Scroll fade-in
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
