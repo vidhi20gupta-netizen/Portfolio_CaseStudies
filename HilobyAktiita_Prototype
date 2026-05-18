@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hilo PM Case Study — Vidhi Gupta</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --ink:       #0B3D3D;
+  --ink-dk:    #062828;
+  --teal:      #0B6E6E;
+  --teal-lt:   #1A9090;
+  --teal-bg:   #EAF5F5;
+  --teal-pale: #F0F8F8;
+  --red:       #C94040;
+  --red-lt:    #FDEAEA;
+  --amber:     #D97706;
+  --amber-lt:  #FEF3C7;
+  --green:     #2D7A4F;
+  --green-lt:  #E8F5EE;
+  --blue:      #1E4FA0;
+  --blue-lt:   #E8EEF8;
+  --gray-dk:   #27272A;
+  --gray-md:   #52525B;
+  --gray-lt:   #A1A1AA;
+  --bg:        #F5F7F7;
+  --white:     #FFFFFF;
+  --border:    #D4E0E0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--gray-dk);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* NAV */
+.navbar {
+  background: var(--ink-dk);
+  padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+}
+.navbar-left { display: flex; align-items: center; gap: 14px; }
+.logo-mark {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; color: white; font-size: 18px;
+}
+.navbar-title { font-weight: 800; font-size: 17px; color: white; }
+.navbar-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+.navbar-badge {
+  background: rgba(11,110,110,0.25);
+  border: 1px solid var(--teal-lt);
+  border-radius: 20px; padding: 4px 14px;
+  font-size: 12px; font-weight: 700; color: var(--teal-lt);
+}
+.user-dot {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--teal); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 13px;
+}
+
+/* TAB BAR */
+.tab-bar {
+  background: var(--ink);
+  padding: 0 32px;
+  display: flex; gap: 0;
+  border-bottom: 2px solid var(--teal);
+  overflow-x: auto;
+}
+.tab {
+  padding: 12px 22px;
+  font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  border-bottom: 3px solid transparent;
+  cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.tab:hover { color: white; }
+.tab.active { color: white; border-bottom-color: var(--teal-lt); }
+
+/* MAIN */
+.main { max-width: 1160px; margin: 0 auto; padding: 28px 24px 80px; }
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* BANNER */
+.banner {
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink-dk) 100%);
+  border-radius: 16px; padding: 28px 32px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+  margin-bottom: 28px; color: white;
+  border-left: 5px solid var(--teal-lt);
+}
+.banner-text h2 { font-size: 20px; font-weight: 800; line-height: 1.3; margin-bottom: 8px; }
+.banner-text p  { font-size: 13px; opacity: 0.75; line-height: 1.6; max-width: 580px; }
+.banner-stats { display: flex; gap: 20px; flex-shrink: 0; }
+.bstat { text-align: center; }
+.bstat .num { font-size: 24px; font-weight: 800; color: var(--teal-lt); }
+.bstat .lbl { font-size: 11px; opacity: 0.6; white-space: nowrap; }
+
+/* CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-bottom: 24px; }
+.card {
+  background: var(--white); border-radius: 14px; padding: 20px 22px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.card-icon { font-size: 22px; margin-bottom: 10px; }
+.card h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.card p  { font-size: 13px; color: var(--gray-md); line-height: 1.55; }
+
+/* SECTION TITLE */
+.section-title { font-size: 20px; font-weight: 800; color: var(--ink-dk); margin-bottom: 6px; }
+.section-sub   { font-size: 13px; color: var(--gray-lt); margin-bottom: 22px; }
+
+/* PHASE TABLE */
+.phase-wrap { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+.phase {
+  background: var(--white); border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.phase-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  background: var(--teal-pale);
+  border-bottom: 1px solid var(--border);
+}
+.phase-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--teal); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; flex-shrink: 0;
+}
+.phase-title { font-weight: 700; font-size: 15px; color: var(--ink); }
+.phase-period { margin-left: auto; font-size: 12px; color: var(--gray-lt); font-weight: 600; }
+.phase-body { padding: 16px 20px; }
+.phase-body p { font-size: 13.5px; color: var(--gray-md); line-height: 1.6; margin-bottom: 12px; }
+.phase-body ul { list-style: none; padding: 0; }
+.phase-body li {
+  font-size: 13px; color: var(--gray-dk);
+  padding: 6px 0 6px 18px;
+  border-bottom: 1px solid #F4F4F5;
+  position: relative;
+}
+.phase-body li:last-child { border-bottom: none; }
+.phase-body li::before { content: "→"; position: absolute; left: 0; color: var(--teal); font-weight: 700; }
+
+/* METRIC STRIP */
+.metric-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px;
+}
+.metric-card {
+  background: var(--white); border-radius: 14px; padding: 18px 20px;
+  border: 1px solid var(--border); text-align: center;
+}
+.metric-card .mval { font-size: 26px; font-weight: 800; color: var(--teal); line-height: 1; margin-bottom: 6px; }
+.metric-card .mlbl { font-size: 12px; color: var(--gray-md); font-weight: 500; line-height: 1.4; }
+.metric-card .mtgt { font-size: 11px; color: var(--gray-lt); margin-top: 4px; }
+
+/* RISK TABLE */
+.risk-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.risk-table th {
+  background: var(--ink); color: white; font-size: 12px; font-weight: 700;
+  padding: 10px 14px; text-align: left;
+}
+.risk-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.risk-table tr:last-child td { border-bottom: none; }
+.risk-table tr:nth-child(even) td { background: var(--teal-pale); }
+.badge {
+  display: inline-block; border-radius: 20px; padding: 2px 10px;
+  font-size: 11px; font-weight: 700;
+}
+.badge-red    { background: var(--red-lt); color: var(--red); }
+.badge-amber  { background: var(--amber-lt); color: var(--amber); }
+.badge-green  { background: var(--green-lt); color: var(--green); }
+.badge-blue   { background: var(--blue-lt); color: var(--blue); }
+
+/* TOOL TABLE */
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+.tool-card {
+  background: var(--white); border-radius: 12px; padding: 16px 18px;
+  border: 1px solid var(--border);
+}
+.tool-card .tname { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.tool-card .tuse  { font-size: 12.5px; color: var(--gray-md); line-height: 1.5; }
+
+/* DISCOVERY TABLE */
+.discovery-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+.disc-card {
+  background: var(--white); border-radius: 14px; padding: 18px 20px;
+  border: 1px solid var(--border);
+}
+.disc-card .disc-icon { font-size: 20px; margin-bottom: 10px; }
+.disc-card h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.disc-card p  { font-size: 12.5px; color: var(--gray-md); line-height: 1.55; }
+
+/* TRACKER VIEW */
+.tracker-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+.tracker-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+.tstat {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 18px; text-align: center; min-width: 110px;
+}
+.tstat .tv { font-size: 22px; font-weight: 800; color: var(--teal); }
+.tstat .tl { font-size: 11px; color: var(--gray-lt); font-weight: 500; }
+.tstat .td { font-size: 11px; color: var(--gray-md); margin-top: 2px; }
+
+.tracker-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+.tracker-table th { background: var(--ink); color: white; font-size: 12px; font-weight: 700; padding: 10px 14px; text-align: left; }
+.tracker-table td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tracker-table tr:last-child td { border-bottom: none; }
+.tracker-table tr:hover td { background: var(--teal-pale); }
+
+.progress-bar { background: #E4E4E7; border-radius: 10px; height: 8px; overflow: hidden; min-width: 80px; }
+.progress-fill { height: 100%; background: var(--teal); border-radius: 10px; transition: width 0.3s; }
+.progress-fill.amber { background: var(--amber); }
+.progress-fill.red   { background: var(--red); }
+
+/* WHY ME */
+.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+.why-card {
+  background: var(--white); border-radius: 14px; padding: 20px 22px;
+  border: 1px solid var(--border);
+}
+.why-card .wlabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal); margin-bottom: 8px; }
+.why-card h4 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+.why-card p  { font-size: 13px; color: var(--gray-md); line-height: 1.6; }
+
+/* FOOTER NOTE */
+.foot-note {
+  background: var(--teal-bg); border-radius: 12px; padding: 16px 20px;
+  border-left: 4px solid var(--teal); margin-top: 24px;
+  font-size: 13px; color: var(--ink); line-height: 1.6;
+}
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-bar label { font-size: 12px; font-weight: 600; color: var(--gray-md); }
+.filter-bar select {
+  border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px;
+  font-size: 12px; background: var(--white); color: var(--gray-dk); cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .metric-strip { grid-template-columns: repeat(2,1fr); }
+  .banner { flex-direction: column; }
+  .banner-stats { flex-direction: row; }
+  .why-grid, .tool-grid, .discovery-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <div class="logo-mark">H</div>
+    <div>
+      <div class="navbar-title">Hilo by Aktiia — PM Case Study</div>
+      <div class="navbar-sub">Senior Product Manager Application</div>
+    </div>
+  </div>
+  <div class="navbar-badge">April 2026</div>
+  <div class="user-dot">VG</div>
+</nav>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active" onclick="show('problem')">💡 The Problem</div>
+  <div class="tab" onclick="show('discovery')">🔍 Discovery</div>
+  <div class="tab" onclick="show('approach')">🗺 Product Approach</div>
+  <div class="tab" onclick="show('metrics')">📊 Metrics</div>
+  <div class="tab" onclick="show('tracker')">🚀 Engagement Tracker</div>
+  <div class="tab" onclick="show('tools')">🤖 AI Tools</div>
+  <div class="tab" onclick="show('why')">🎯 Why Me</div>
+</div>
+
+<div class="main">
+
+<!-- ── VIEW: PROBLEM ─────────────────────────────────────────────────────── -->
+<div class="view active" id="view-problem">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>From Accurate Measurement to Behavior That Sticks:<br>The Engagement Gap in Continuous Blood Pressure Monitoring</h2>
+      <p>Hilo has solved the hardest part — clinical-grade, cuffless, continuous BP measurement validated through trials and CE Marked. The product challenge that remains is different in kind: how do you turn a stream of medically accurate data into something a user acts on, trusts, and keeps using long enough to change their cardiovascular health?</p>
+    </div>
+    <div class="banner-stats">
+      <div class="bstat"><div class="num">18M</div><div class="lbl">deaths/year from<br>high BP</div></div>
+      <div class="bstat"><div class="num">&lt;50%</div><div class="lbl">hypertension patients<br>at treatment goal</div></div>
+      <div class="bstat"><div class="num">30–60%</div><div class="lbl">wearable health product<br>drop-off within 90 days</div></div>
+    </div>
+  </div>
+
+  <p class="section-title">The problem nobody is talking about</p>
+  <p class="section-sub">Hilo's technology moat is real. The product challenge is upstream of the technology.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <h3>What Hilo has already won</h3>
+      <p>Clinically validated accuracy. CE Marked Class IIa medical device. Available in 12 countries. 18 years of CSEM research behind the algorithm. Hilo wins the "does it work?" argument before a user even opens the app.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚠️</div>
+      <h3>Where the value disappears</h3>
+      <p>Continuous monitoring generates a stream of data most users have no framework to interpret. A reading of 138/88 at 2pm on a Tuesday means nothing without context — trend, triggers, comparison to the morning, relationship to yesterday's walk. Without that context, users check the number, feel anxious or reassured, and do nothing differently.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h3>The hidden product problem</h3>
+      <p>Retention in consumer health wearables follows a predictable curve: high engagement in week one (novelty), steep drop-off by week six (the data makes no sense), plateau at a small engaged segment. Hilo's mission — changing cardiovascular health outcomes — requires behavior change. Behavior change requires sustained engagement. Sustained engagement requires the user to feel that the product understands them.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💡</div>
+      <h3>What the PM role can fix</h3>
+      <p>The engagement gap is not a data science problem. The algorithm is already good. It is a product problem — specifically a personalization, context, and intervention design problem. A PM who treats engagement retention as a first-class metric, and who knows how to run structured experiments on a health platform, can measurably close this gap within 12 months.</p>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    <strong>Why this problem, why now:</strong> Hilo is available in 12 countries and has clinical validation. The scale challenge is no longer "does it measure accurately?" — it is "does it change behavior at scale?" That is a product execution challenge, not a science one. The Senior PM role is positioned exactly to own it.
+  </div>
+</div>
+
+<!-- ── VIEW: DISCOVERY ────────────────────────────────────────────────────── -->
+<div class="view" id="view-discovery">
+  <p class="section-title">What I would learn before writing a spec</p>
+  <p class="section-sub">Three discovery workstreams I would run in the first 60 days — before touching the roadmap.</p>
+
+  <div class="discovery-grid">
+    <div class="disc-card">
+      <div class="disc-icon">👤</div>
+      <h4>Ride-along with users at the 6-week mark</h4>
+      <p>Not user interviews. Observation sessions with users who are 5-7 weeks in — the exact point the drop-off curve steepens. What do they check? What do they ignore? What question do they ask themselves when they look at their BP trend that the app currently cannot answer? That question is the product gap.</p>
+    </div>
+    <div class="disc-card">
+      <div class="disc-icon">📊</div>
+      <h4>Amplitude deep-dive: engagement segmentation</h4>
+      <p>Retention curves will not be uniform. There will be a cohort of users who sustain engagement at 90 days. Understanding what they do differently in weeks two and three — which features they use, what notifications they respond to, how often they add context — is more valuable than any survey. I would build this analysis before writing a single spec.</p>
+    </div>
+    <div class="disc-card">
+      <div class="disc-icon">🏥</div>
+      <h4>Clinical pathway mapping</h4>
+      <p>Many Hilo users will be managing hypertension alongside a GP or cardiologist. Understanding how the Hilo data intersects with clinical appointments — does a user share their trend? Does the GP ask? Is there friction? — reveals a product surface that could significantly increase perceived value and retention without a single new feature.</p>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:8px">Tensions I expect to find</p>
+  <p class="section-sub">Hypotheses I would test, not assumptions I would build on.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">😰</div>
+      <h3>Anxiety vs. insight</h3>
+      <p>For some users, seeing a continuous BP trend increases health anxiety without increasing understanding. The product needs to distinguish between data that empowers and data that overwhelms — and serve them differently.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔔</div>
+      <h3>Notification fatigue</h3>
+      <p>The right cadence of insights is not daily. It may not even be weekly. A user who gets an "elevated BP this afternoon" push every three days will mute the app. A user who gets one genuinely surprising, contextualized insight per week might share it with their doctor.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧠</div>
+      <h3>The calibration trust problem</h3>
+      <p>Continuous monitoring surfaces variance. Users who check traditional cuffs once a week never see the intraday swings. Seeing them for the first time is alarming. The product needs to actively teach what normal variance looks like — or engagement drops when a user sees a spike and concludes the device is broken.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIEW: APPROACH ─────────────────────────────────────────────────────── -->
+<div class="view" id="view-approach">
+  <p class="section-title">Product approach — three phases</p>
+  <p class="section-sub">Structured to generate learning at each stage before committing to the next.</p>
+
+  <div class="phase-wrap">
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">1</div>
+        <div class="phase-title">Contextual intelligence layer — make the data mean something</div>
+        <div class="phase-period">Weeks 1–10</div>
+      </div>
+      <div class="phase-body">
+        <p>The first version does not add features. It adds context to what already exists. The goal is to make every BP reading accompanied by at least one signal that explains it — not "your BP is 138/88" but "your BP is slightly elevated this afternoon, consistent with the pattern on your last three Mondays." The user should finish the check feeling they understand something, not just feeling informed.</p>
+        <ul>
+          <li>Instrument the "what happened after checking their BP" flow in Amplitude — this is the behavior that reveals whether context is working</li>
+          <li>Build the pattern recognition layer: day-of-week trends, activity correlation, sleep correlation (if data available)</li>
+          <li>Define and ship a "weekly digest" — one meaningful, personalized insight per week, not a data summary</li>
+          <li>North Star for this phase: 7-day and 30-day active user rate vs. week-one peak (the drop-off metric)</li>
+          <li>Run a hold-out experiment: no weekly digest vs. weekly digest — measure retention at day 30</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">2</div>
+        <div class="phase-title">Personalized intervention design — move from insight to action</div>
+        <div class="phase-period">Weeks 10–20</div>
+      </div>
+      <div class="phase-body">
+        <p>Once context is working and engagement has stabilized, the next challenge is behavior change. The product needs to offer a user a small, credible action they can take in response to a pattern — and then close the loop on whether it worked. This is where most health apps fail: they surface insight without creating an action path. Hilo's clinical credibility makes this tractable in a way it is not for fitness trackers.</p>
+        <ul>
+          <li>Design an "experiment for yourself" feature: user selects a behavior change (morning walk, reducing coffee, consistent sleep time), sets a two-week window, Hilo tracks the BP trend against it</li>
+          <li>Build a goal-setting layer that connects user-defined health goals to the metrics framework — not generic targets, but personalized based on their trend</li>
+          <li>Explore GP sharing: a one-tap summary a user can show their doctor at the next appointment (PDF or in-app view) — this surfaces value at the moment it matters most</li>
+          <li>Metric: % of weekly active users who complete at least one "experiment for yourself" cycle by Month 4</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">3</div>
+        <div class="phase-title">Closed-loop learning and clinical integration</div>
+        <div class="phase-period">Weeks 20–36</div>
+      </div>
+      <div class="phase-body">
+        <p>Every completed behavior experiment generates labeled data: what a user tried, how long they tried it, and what happened to their BP. At scale this is Hilo's most defensible asset — personalized, longitudinal behavioral data attached to a clinically validated BP signal. Phase 3 formalizes the feedback loop and begins to position Hilo as the clinical companion it can become.</p>
+        <ul>
+          <li>Aggregate anonymized experiment outcomes to improve the recommendation model — which interventions produce measurable BP change, for which user profiles?</li>
+          <li>Explore HCP (healthcare provider) integration: a structured data export for GPs managing hypertension patients on Hilo</li>
+          <li>Build a "longitudinal view" — a user-facing timeline connecting BP trend to logged events over 6-12 months. This is the product feature that makes Hilo irreplaceable at annual check-up time.</li>
+          <li>Metric: 90-day retention rate vs. pre-Phase-1 baseline; GP-shared export usage rate</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:8px">Risk register</p>
+  <p class="section-sub">Issues I would surface before they surface themselves.</p>
+  <table class="risk-table">
+    <thead>
+      <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Medical advice liability — personalized interventions cross into clinical guidance territory</td>
+        <td><span class="badge badge-red">High</span></td>
+        <td>Frame all suggestions as "patterns to explore" not "recommendations." Legal review before Phase 2 ships. Consult regulatory team on Class IIa boundary.</td>
+      </tr>
+      <tr>
+        <td>Notification fatigue erodes the "weekly insight" before it has time to build trust</td>
+        <td><span class="badge badge-amber">Medium</span></td>
+        <td>A/B test cadence and framing from day one. Instrument unsubscribe and mute rates as a leading indicator — don't wait for retention curves.</td>
+      </tr>
+      <tr>
+        <td>Personalization quality is low in early cohorts — too little longitudinal data to generate meaningful patterns</td>
+        <td><span class="badge badge-amber">Medium</span></td>
+        <td>Set explicit threshold: only surface a pattern insight after minimum 3 weeks of data. Fallback to generic educational content before threshold.</td>
+      </tr>
+      <tr>
+        <td>GP sharing adds complexity without adoption — HCP workflows are not designed for patient-generated data</td>
+        <td><span class="badge badge-blue">Low / Long-term</span></td>
+        <td>Validate with GP interviews before building. Start with a simple PDF export — no integration, no partnership required. Measure whether GPs actually look at it.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── VIEW: METRICS ───────────────────────────────────────────────────────── -->
+<div class="view" id="view-metrics">
+  <p class="section-title">Metrics framework</p>
+  <p class="section-sub">How I would define success — and what I would instrument before writing a single spec.</p>
+
+  <div class="metric-strip">
+    <div class="metric-card">
+      <div class="mval">D30</div>
+      <div class="mlbl">Retention rate</div>
+      <div class="mtgt">Target: +25% vs. baseline<br>by Month 4</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">40%</div>
+      <div class="mlbl">Weekly digest open rate</div>
+      <div class="mtgt">Target within first 6 weeks<br>of rollout</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">30%</div>
+      <div class="mlbl">Behavior experiment<br>completion rate</div>
+      <div class="mtgt">Phase 2 — among<br>weekly active users</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">D90</div>
+      <div class="mlbl">Retention milestone</div>
+      <div class="mtgt">North Star: match<br>D7 retention by Month 8</div>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:8px">Metric hierarchy</p>
+  <p class="section-sub">Not all metrics are equal. This is the stack I would instrument and review weekly.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">⭐</div>
+      <h3>North Star</h3>
+      <p>D30 and D90 active user rate as a percentage of D7 rate — the engagement retention ratio. This captures the drop-off curve directly. It does not matter how many users activate if 80% are gone by week six.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h3>Leading indicators</h3>
+      <p>Weekly digest open rate (predicts retention 3 weeks ahead). Behavior experiment completion (predicts long-term habit formation). Notification mute rate (early warning for friction before it shows in retention).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏥</div>
+      <h3>Health outcome proxies</h3>
+      <p>% of users whose 30-day BP average improves by Month 3. % of users who share a GP report. These are lagging indicators but they are the mission metrics — the ones I would put in front of leadership quarterly.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚫</div>
+      <h3>Counter-metrics</h3>
+      <p>Health anxiety rate (flagged in support tickets). Notification unsubscribe rate. BP reading frequency decline. These are the signals that tell me the product is moving in the wrong direction before the retention curve does.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIEW: TRACKER ───────────────────────────────────────────────────────── -->
+<div class="view" id="view-tracker">
+  <p class="section-title">Engagement Initiative Tracker</p>
+  <p class="section-sub">Prototype dashboard — tracks the three-phase rollout against key milestones and metric targets.</p>
+
+  <div class="tracker-header">
+    <div class="tracker-stats">
+      <div class="tstat">
+        <div class="tv">3</div>
+        <div class="tl">Active phases</div>
+        <div class="td">P1 live, P2 design, P3 scoped</div>
+      </div>
+      <div class="tstat">
+        <div class="tv">68%</div>
+        <div class="tl">Phase 1 completion</div>
+        <div class="td">Context layer in progress</div>
+      </div>
+      <div class="tstat">
+        <div class="tv">D30 +18%</div>
+        <div class="tl">Retention vs. baseline</div>
+        <div class="td">Target: +25% by Month 4</div>
+      </div>
+      <div class="tstat">
+        <div class="tv">34%</div>
+        <div class="tl">Weekly digest open rate</div>
+        <div class="td">Target: 40% by wk 6</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <label>Filter by phase:</label>
+    <select onchange="filterTracker(this.value)">
+      <option value="all">All phases</option>
+      <option value="1">Phase 1 — Context layer</option>
+      <option value="2">Phase 2 — Interventions</option>
+      <option value="3">Phase 3 — Clinical loop</option>
+    </select>
+    <label style="margin-left:12px">Status:</label>
+    <select onchange="filterStatus(this.value)">
+      <option value="all">All</option>
+      <option value="live">Live</option>
+      <option value="design">In design</option>
+      <option value="scoped">Scoped</option>
+    </select>
+  </div>
+
+  <table class="tracker-table" id="tracker-table">
+    <thead>
+      <tr>
+        <th>Initiative</th>
+        <th>Phase</th>
+        <th>Status</th>
+        <th>Key metric</th>
+        <th>Progress</th>
+        <th>Risk</th>
+      </tr>
+    </thead>
+    <tbody id="tracker-body">
+    </tbody>
+  </table>
+
+  <div class="foot-note" style="margin-top:20px">
+    <strong>Note on this tracker:</strong> This is a prototype built to illustrate how I would manage the engagement initiative. In practice I would run this in Amplitude (for metric columns) cross-referenced with Jira (for delivery status). The data here is illustrative of the framework, not real Hilo performance data.
+  </div>
+</div>
+
+<!-- ── VIEW: TOOLS ─────────────────────────────────────────────────────────── -->
+<div class="view" id="view-tools">
+  <p class="section-title">How I actually use AI tools</p>
+  <p class="section-sub">Concrete, not aspirational — this is how I work today.</p>
+
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tname">Cursor + Claude Code — rapid prototyping</div>
+      <div class="tuse">At Soulspiti I built the full OMS architecture as an agentic prototype before any production code was written — choosing the no-code route over custom development that was 4x the cost and 2x the timeline. At Hilo this would mean: interactive spec prototypes I can put in front of users and engineers in hours, not days. The weekly digest layout, the behavior experiment UI, the GP report format — all prototypable before a designer opens Figma.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tname">Amplitude + AI-assisted analysis — find the signal in the noise</div>
+      <div class="tuse">I use Claude to accelerate the "what should I look for?" stage of funnel analysis — generating cohort segmentation hypotheses and SQL query drafts before I go into Amplitude. This means I spend analyst time validating hypotheses, not forming them. At Coinhaven I used this workflow to identify the checkout step that was causing 18% payment failure — the fix improved success rate within two weeks of shipping.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tname">Lovable — visual prototypes for user testing</div>
+      <div class="tuse">For user research sessions I use Lovable to build functional-looking prototypes I can put in front of users the same week a hypothesis forms. At Hilo this would mean testing the weekly digest format with real users before engineering builds anything — does "your BP trend this week" or "something changed on Tuesday" perform better? I can answer that before sprint planning starts.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tname">Make.com / n8n — workflow automation</div>
+      <div class="tuse">I use no-code automation to compress internal processes that would otherwise require engineering tickets. At Soulspiti I automated 94% of order routing without writing a line of production code. At Hilo, early versions of the GP report export, the weekly digest generation, or the notification trigger logic could all be validated with no-code before a production build is justified.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tname">AI-assisted spec writing</div>
+      <div class="tuse">I use Claude to validate spec logic before sharing with engineering — specifically to find edge cases I have not considered and to check whether acceptance criteria are ambiguous. The goal is specs that eliminate back-and-forth, not specs that document decisions I have already made. Engineers at ABB told me my specs were unusually complete; this process is why.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tname">What I would not use AI for</div>
+      <div class="tuse">Product decisions. Prioritization calls. Discovery synthesis. Those require judgment formed from talking to users and reading data — AI accelerates the inputs, it does not replace the reasoning. I am wary of PMs who use AI to generate roadmaps. I use it to pressure-test the ones I have already formed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIEW: WHY ME ────────────────────────────────────────────────────────── -->
+<div class="view" id="view-why">
+  <p class="section-title">Why this problem, why me</p>
+  <p class="section-sub">Four specific parallels between my track record and what Hilo needs next.</p>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="wlabel">Parallel 1 — Data as product</div>
+      <h4>Making model outputs trustworthy enough to change behavior</h4>
+      <p>At ABB E-mobility I collaborated directly with data scientists to translate predictive model outputs (telemetry, weather, grid data) into scheduling decisions fleet operators trusted enough to act on without second-guessing — delivering 99% operational certainty. The challenge was identical in kind to Hilo's engagement problem: how do you make a model output feel credible and actionable to a non-technical user? Trust is the product, not the algorithm.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Parallel 2 — Metrics framework from zero</div>
+      <h4>Building the instrumentation layer before the product decisions</h4>
+      <p>At Soulspiti I built the full product metrics framework from zero — defined North Star (conversion, repeat purchase, cancellation), instrumented every funnel stage, and used the data to drive every prioritization call. I did not inherit an analytics stack; I designed one. At Hilo, defining the engagement metrics framework — retention cohorts, leading indicators, counter-metrics — is foundational work I have done before and would do again from day one.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Parallel 3 — Experimentation at the right pace</div>
+      <h4>Running structured experiments in environments where mistakes have real consequences</h4>
+      <p>At Coinhaven I built a data-driven experimentation framework from scratch in a regulated fintech environment — improving payment success by 18% and cutting drop-off from 42% to 14% through rigorous A/B testing. The constraint of "this is a financial platform, we cannot break user trust" is directly analogous to "this is a medical device, we cannot generate health anxiety." Experimentation in constrained environments is a specific skill. I have it.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Parallel 4 — Crisis as product intelligence</div>
+      <h4>Using a system failure as the dataset for the next version</h4>
+      <p>At Soulspiti I managed a full operational crisis — 2.3x normal order volume, 25% cancellation, viral complaints — and turned the post-mortem into the product spec for the circuit breaker system that held cancellation at 6.4% the following year on 120% more revenue. The discipline of running toward a product failure, instrumenting it, and shipping the fix is exactly the mindset Hilo needs as it scales into more markets and user cohorts where the engagement curve will break in new ways.</p>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    <strong>On London and the mission:</strong> I am based in Berlin and open to relocating to London for this role. I chose every job I have taken because the product and the mission were the same problem. Hilo is that company at the right moment — clinical validation is done, scale is the challenge, and the product decisions that get made in the next 18 months will determine whether Hilo changes cardiovascular health outcomes or becomes another wearable people try for six weeks. I want to be in the room for those decisions.
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── TAB SWITCHING ────────────────────────────────────────────────────────────
+function show(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── TRACKER DATA ─────────────────────────────────────────────────────────────
+const initiatives = [
+  { name: "BP trend contextualization (day-of-week patterns)", phase: "1", status: "live",   metric: "D30 retention +18% vs. baseline", progress: 72, risk: "low" },
+  { name: "Weekly digest — personalized insight push",         phase: "1", status: "live",   metric: "Open rate 34% (target: 40%)",       progress: 85, risk: "amber" },
+  { name: "Notification cadence A/B test",                    phase: "1", status: "live",   metric: "Mute rate: 8% (monitoring)",        progress: 90, risk: "low" },
+  { name: "Activity correlation layer (steps + BP)",           phase: "1", status: "design", metric: "Awaiting data science sign-off",    progress: 40, risk: "amber" },
+  { name: "Pattern threshold guardrails (min 3 weeks data)",   phase: "1", status: "live",   metric: "Edge case coverage 100%",          progress: 100, risk: "low" },
+  { name: "Behavior experiment — 'try this for 2 weeks'",      phase: "2", status: "design", metric: "Target: 30% completion by Month 4", progress: 25, risk: "amber" },
+  { name: "Goal-setting layer (personalized BP targets)",      phase: "2", status: "design", metric: "Requires clinical review",          progress: 15, risk: "red" },
+  { name: "GP shareable BP summary (PDF export)",              phase: "2", status: "scoped", metric: "GP interview validation pending",   progress: 5,  risk: "amber" },
+  { name: "Closed-loop experiment outcomes model",             phase: "3", status: "scoped", metric: "Requires Phase 2 data",             progress: 0,  risk: "low" },
+  { name: "Longitudinal view — 6-month BP + events timeline", phase: "3", status: "scoped", metric: "Scoped, not yet sized",             progress: 0,  risk: "low" },
+  { name: "HCP integration exploration",                       phase: "3", status: "scoped", metric: "Partnership track — separate WS",   progress: 0,  risk: "amber" },
+];
+
+let activePhase = "all";
+let activeStatus = "all";
+
+function renderTracker() {
+  const tbody = document.getElementById('tracker-body');
+  const rows = initiatives.filter(i =>
+    (activePhase === "all" || i.phase === activePhase) &&
+    (activeStatus === "all" || i.status === activeStatus)
+  );
+
+  tbody.innerHTML = rows.map(i => {
+    const statusColors = { live: "badge-green", design: "badge-blue", scoped: "badge-amber" };
+    const riskColors   = { low: "badge-green", amber: "badge-amber", red: "badge-red" };
+    const barClass = i.risk === "red" ? "red" : i.progress < 50 ? "amber" : "";
+    return `<tr data-phase="${i.phase}" data-status="${i.status}">
+      <td>${i.name}</td>
+      <td>Phase ${i.phase}</td>
+      <td><span class="badge ${statusColors[i.status]}">${i.status}</span></td>
+      <td style="font-size:12px;color:var(--gray-md)">${i.metric}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-bar">
+            <div class="progress-fill ${barClass}" style="width:${i.progress}%"></div>
+          </div>
+          <span style="font-size:12px;color:var(--gray-lt);min-width:28px">${i.progress}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${riskColors[i.risk]}">${i.risk}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTracker(val) { activePhase = val; renderTracker(); }
+function filterStatus(val)  { activeStatus = val; renderTracker(); }
+
+renderTracker();
+</script>
+</body>
+</html>
