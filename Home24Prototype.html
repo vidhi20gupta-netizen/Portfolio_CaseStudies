@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>home24 PM Case Study — Vidhi Gupta</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --navy:      #1B3A6B;
+  --navy-dk:   #0F2547;
+  --navy-lt:   #2E5BA8;
+  --navy-bg:   #EEF3FB;
+  --navy-pale: #F5F8FD;
+  --red:       #C0392B;
+  --red-lt:    #FDECEA;
+  --amber:     #D97706;
+  --amber-lt:  #FEF3C7;
+  --green:     #1E7E4A;
+  --green-lt:  #E6F4ED;
+  --gray-dk:   #1A1A2E;
+  --gray-md:   #52525B;
+  --gray-lt:   #A1A1AA;
+  --bg:        #F4F6FA;
+  --white:     #FFFFFF;
+  --border:    #D8DFF0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--gray-dk); font-size: 15px; line-height: 1.6; }
+
+.navbar {
+  background: var(--navy-dk); padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.navbar-left { display: flex; align-items: center; gap: 14px; }
+.logo-mark { width: 40px; height: 40px; border-radius: 10px; background: var(--navy-lt); display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 18px; }
+.navbar-title { font-weight: 800; font-size: 17px; color: white; }
+.navbar-sub { font-size: 11px; color: rgba(255,255,255,0.45); }
+.navbar-badge { background: rgba(46,91,168,0.3); border: 1px solid var(--navy-lt); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 700; color: #8AABDF; }
+.user-dot { width: 34px; height: 34px; border-radius: 50%; background: var(--navy-lt); color: white; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; }
+
+.tab-bar { background: var(--navy); padding: 0 32px; display: flex; border-bottom: 2px solid var(--navy-lt); overflow-x: auto; }
+.tab { padding: 12px 20px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.tab:hover { color: white; }
+.tab.active { color: white; border-bottom-color: #8AABDF; }
+
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 24px 80px; }
+.view { display: none; }
+.view.active { display: block; }
+
+.banner {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dk) 100%);
+  border-radius: 16px; padding: 28px 32px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+  margin-bottom: 28px; color: white; border-left: 5px solid #8AABDF;
+}
+.banner-text h2 { font-size: 20px; font-weight: 800; line-height: 1.3; margin-bottom: 8px; }
+.banner-text p { font-size: 13px; opacity: 0.75; line-height: 1.6; max-width: 580px; }
+.banner-stats { display: flex; gap: 20px; flex-shrink: 0; }
+.bstat { text-align: center; }
+.bstat .num { font-size: 22px; font-weight: 800; color: #8AABDF; }
+.bstat .lbl { font-size: 11px; opacity: 0.6; white-space: nowrap; }
+
+.section-title { font-size: 19px; font-weight: 800; color: var(--navy-dk); margin-bottom: 6px; }
+.section-sub { font-size: 13px; color: var(--gray-lt); margin-bottom: 20px; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.card { background: var(--white); border-radius: 14px; padding: 20px 22px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.card-icon { font-size: 22px; margin-bottom: 10px; }
+.card h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.card p { font-size: 13px; color: var(--gray-md); line-height: 1.55; }
+
+.phase-wrap { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.phase { background: var(--white); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+.phase-header { display: flex; align-items: center; gap: 14px; padding: 14px 20px; background: var(--navy-pale); border-bottom: 1px solid var(--border); }
+.phase-num { width: 32px; height: 32px; border-radius: 50%; background: var(--navy-lt); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; }
+.phase-title { font-weight: 700; font-size: 15px; color: var(--navy); }
+.phase-period { margin-left: auto; font-size: 12px; color: var(--gray-lt); font-weight: 600; }
+.phase-body { padding: 16px 20px; }
+.phase-body p { font-size: 13.5px; color: var(--gray-md); line-height: 1.6; margin-bottom: 12px; }
+.phase-body ul { list-style: none; padding: 0; }
+.phase-body li { font-size: 13px; color: var(--gray-dk); padding: 6px 0 6px 18px; border-bottom: 1px solid #F4F4F5; position: relative; }
+.phase-body li:last-child { border-bottom: none; }
+.phase-body li::before { content: "→"; position: absolute; left: 0; color: var(--navy-lt); font-weight: 700; }
+
+.metric-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.metric-card { background: var(--white); border-radius: 14px; padding: 18px 20px; border: 1px solid var(--border); text-align: center; }
+.metric-card .mval { font-size: 24px; font-weight: 800; color: var(--navy-lt); line-height: 1; margin-bottom: 6px; }
+.metric-card .mlbl { font-size: 12px; color: var(--gray-md); font-weight: 500; line-height: 1.4; }
+.metric-card .msub { font-size: 11px; color: var(--gray-lt); margin-top: 4px; }
+
+.tradeoff-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.tradeoff-table th { background: var(--navy); color: white; font-size: 12px; font-weight: 700; padding: 10px 14px; text-align: left; }
+.tradeoff-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.tradeoff-table tr:last-child td { border-bottom: none; }
+.tradeoff-table tr:nth-child(even) td { background: var(--navy-pale); }
+
+.map-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; background: var(--white); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+.map-table th { background: var(--navy); color: white; font-size: 12px; font-weight: 700; padding: 10px 14px; text-align: left; }
+.map-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.map-table tr:last-child td { border-bottom: none; }
+
+.badge { display: inline-block; border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+.badge-green  { background: var(--green-lt);  color: var(--green); }
+.badge-amber  { background: var(--amber-lt);  color: var(--amber); }
+.badge-blue   { background: var(--navy-bg);   color: var(--navy-lt); }
+
+.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.why-card { background: var(--white); border-radius: 14px; padding: 20px 22px; border: 1px solid var(--border); }
+.why-card .wlabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--navy-lt); margin-bottom: 8px; }
+.why-card h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.why-card p { font-size: 13px; color: var(--gray-md); line-height: 1.6; }
+
+.foot-note { background: var(--navy-bg); border-radius: 12px; padding: 16px 20px; border-left: 4px solid var(--navy-lt); margin-top: 20px; font-size: 13px; color: var(--navy-dk); line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .metric-strip { grid-template-columns: repeat(2,1fr); }
+  .banner { flex-direction: column; }
+  .why-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-left">
+    <div class="logo-mark">h</div>
+    <div>
+      <div class="navbar-title">home24 — PM Case Study</div>
+      <div class="navbar-sub">Senior PM, Personalization, Loyalty &amp; Apps</div>
+    </div>
+  </div>
+  <div class="navbar-badge">April 2026</div>
+  <div class="user-dot">VG</div>
+</nav>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="show('problem')">💡 Problem Discovery</div>
+  <div class="tab" onclick="show('framing')">🔍 Problem Framing</div>
+  <div class="tab" onclick="show('solution')">🗺 Solution</div>
+  <div class="tab" onclick="show('execution')">⚙️ Execution</div>
+  <div class="tab" onclick="show('impact')">📊 Impact</div>
+  <div class="tab" onclick="show('why')">🎯 Why Me</div>
+</div>
+
+<div class="main">
+
+<!-- ── PROBLEM DISCOVERY ──────────────────────────────────────────────────── -->
+<div class="view active" id="view-problem">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>Building Retention in a Low-Frequency, High-AOV E-commerce Context</h2>
+      <p>At Soulspiti — a D2C artisan marketplace — I owned the full consumer product from zero, including the retention layer, CRO programme, and mobile rebuild. This case study covers 27 months of discovery-to-delivery work directly relevant to home24's Personalization, Loyalty, and Apps remit.</p>
+    </div>
+    <div class="banner-stats">
+      <div class="bstat"><div class="num">8% → 16.5%</div><div class="lbl">Repeat purchase rate</div></div>
+      <div class="bstat"><div class="num">+187%</div><div class="lbl">Site conversion</div></div>
+      <div class="bstat"><div class="num">+175%</div><div class="lbl">Mobile conversion</div></div>
+    </div>
+  </div>
+
+  <div class="section-title">What I Found When I Started</div>
+  <div class="section-sub">Soulspiti, Jan 2024 — artisan D2C marketplace, handcrafted home goods, India</div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📉</div>
+      <h3>Repeat purchase rate stuck at 8%</h3>
+      <p>Customers bought once and did not return. There was no retention layer — no lifecycle emails, no win-back logic, no referral mechanism. Every customer acquired was effectively a one-time transaction, and the unit economics only worked if that changed.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <h3>Mobile was the biggest gap in the funnel</h3>
+      <p>72% of traffic was arriving on mobile. Conversion rate on that traffic: 0.4%. The experience had never been designed as a first-class mobile surface. Every future retention investment would land in a broken environment unless this was fixed first.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛒</div>
+      <h3>High cart abandonment, no recovery</h3>
+      <p>No cart recovery flow existed. Customers were adding items and leaving with no follow-up. In a high-AOV category where purchase decisions take time, this was a straightforward gap with measurable upside.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎫</div>
+      <h3>Hidden demand invisible in quantitative data</h3>
+      <p>The funnel metrics pointed to conversion problems, but not their root causes. A manual pass through support tickets revealed a pattern that the dashboards did not show: 36% of customer inquiries contained requests for product customization — a product gap driving abandonment that no standard analytics would surface.</p>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    <strong>Why this is relevant to home24:</strong> Home and living is structurally similar to artisan goods — considered purchase, high AOV, long inter-purchase windows. The retention and CRO challenges I worked on at Soulspiti are the same category of problem this role is designed to solve, at greater scale.
+  </div>
+</div>
+
+<!-- ── PROBLEM FRAMING ────────────────────────────────────────────────────── -->
+<div class="view" id="view-framing">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>Framing the Problem Before Jumping to Solutions</h2>
+      <p>Before building anything, I needed to understand which problems were structural versus symptoms, and what sequencing made sense. Getting this wrong would mean building retention campaigns that land in a broken mobile environment, or investing in lifecycle emails before fixing the funnel leaks they would fall into.</p>
+    </div>
+  </div>
+
+  <div class="section-title">How I Framed the Problem</div>
+  <div class="section-sub">Three distinct layers, each requiring a different type of intervention</div>
+
+  <div class="phase-wrap">
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">1</div>
+        <div class="phase-title">Layer 1 — The surface was broken before retention could work</div>
+      </div>
+      <div class="phase-body">
+        <p>The mobile conversion problem was upstream of everything else. Any lifecycle email, any win-back campaign, any referral link would land on a mobile experience converting at 0.4%. The return on retention investment was being capped by a product problem that had nothing to do with messaging or timing.</p>
+        <ul>
+          <li>72% of traffic arriving at 0.4% mobile conversion = structural ceiling on all retention work</li>
+          <li>Decision: fix mobile first, before building any lifecycle layer on top of it</li>
+          <li>This meant a deliberate delay on retention feature work — the right call, not the easy one</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">2</div>
+        <div class="phase-title">Layer 2 — The funnel had known leaks that A/B testing alone would not close</div>
+      </div>
+      <div class="phase-body">
+        <p>Conversion analysis showed specific drop-off points: broken search and filtering making product discovery frustrating, and cart abandonment with zero recovery mechanism. These were product gaps, not messaging gaps. Running lifecycle emails on top of a leaking funnel would not move the numbers.</p>
+        <ul>
+          <li>Fixed search and filtering as a prerequisite to CRO experimentation</li>
+          <li>Launched cart recovery (3-touch sequence) to capture high-intent abandonment</li>
+          <li>Ran A/B testing programme only once the surface was stable enough to generate valid signal</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">3</div>
+        <div class="phase-title">Layer 3 — Retention required a built-from-scratch lifecycle layer</div>
+      </div>
+      <div class="phase-body">
+        <p>With the surface fixed and funnel leaks addressed, the retention problem was clear: there was no lifecycle layer at all. No welcome series, no post-purchase flow, no win-back, no referral mechanism. Every repeat purchase was happening despite the product, not because of it. This needed to be built end to end.</p>
+        <ul>
+          <li>No existing CRM infrastructure — needed to design, sequence, and ship from zero</li>
+          <li>Low-frequency purchase category meant standard win-back timing (30-day) would not apply</li>
+          <li>Referral was the highest-leverage acquisition channel that did not yet exist in any form</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    <strong>The framing principle:</strong> In a considered-purchase category, retention investment has a ceiling set by the product surface it lands on. The sequence — fix the surface, close the funnel leaks, then build the retention layer — determined what got built and when.
+  </div>
+</div>
+
+<!-- ── SOLUTION ────────────────────────────────────────────────────────────── -->
+<div class="view" id="view-solution">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>What I Built</h2>
+      <p>Three sequential workstreams, each dependent on the one before it. Mobile rebuild first. Funnel fixes and CRO programme second. Retention layer third. Every decision was made to compound — not to deliver a quick metric and move on.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Workstream 1 — Mobile Rebuild</div>
+  <div class="section-sub">Ground-up rebuild, not a responsive fix</div>
+
+  <div class="phase-wrap">
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">A</div>
+        <div class="phase-title">Decision: full rebuild over incremental improvement</div>
+      </div>
+      <div class="phase-body">
+        <p>The diagnostic was clear: 72% of traffic at 0.4% conversion was not a UI polish problem. The mobile experience had been built as a desktop-responsive fallback, not as a first-class product surface. Incremental fixes would not close a gap that large. I led a ground-up mobile rebuild — new navigation, product discovery, checkout flow, and onboarding — designed for mobile-first interaction.</p>
+        <ul>
+          <li>Rebuilt product discovery: category browsing, search, filtering optimized for mobile</li>
+          <li>Rebuilt checkout: simplified flow with progress indicator, optimized for small screen</li>
+          <li>Result: mobile conversion from 0.4% to 1.1% within 2 weeks of launch (+175%)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:8px">Workstream 2 — CRO and Experimentation Programme</div>
+  <div class="section-sub">Systematic, not ad hoc</div>
+
+  <div class="phase-wrap">
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">B</div>
+        <div class="phase-title">Structured A/B testing programme across the funnel</div>
+      </div>
+      <div class="phase-body">
+        <p>Once the mobile surface was stable, I ran a structured A/B testing programme across the full funnel — not single experiments but a compounding programme with documented learnings applied to successive tests. Fixed broken search and filtering. Launched cart recovery. Iterated on product page layout, checkout copy, and offer mechanics.</p>
+        <ul>
+          <li>Launched cart recovery (3-touch sequence): 15–20% recovery rate</li>
+          <li>Fixed search and filtering — measurable drop in bounce rate at product discovery stage</li>
+          <li>Compounding A/B programme: overall site conversion 0.67% to 1.92% (+187%) over 27 months</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">C</div>
+        <div class="phase-title">Signal-driven feature discovery: customization</div>
+      </div>
+      <div class="phase-body">
+        <p>The customization feature did not come from a roadmap assumption — it came from a manual pass through support tickets. 36% of customer inquiries contained requests for product customization. That signal was invisible in the quantitative funnel data. I scoped and shipped the feature end to end.</p>
+        <ul>
+          <li>Source: support ticket analysis — not dashboards, not surveys</li>
+          <li>28% customer adoption post-launch</li>
+          <li>Measurable uplift in average order value</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:8px">Workstream 3 — Retention Layer</div>
+  <div class="section-sub">Built from zero, designed to compound</div>
+
+  <div class="phase-wrap">
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-num">D</div>
+        <div class="phase-title">Lifecycle emails, win-back flows, referral programme</div>
+      </div>
+      <div class="phase-body">
+        <p>Built the full retention layer from zero: welcome series, post-purchase flows, win-back campaigns, and a referral programme. The referral programme was designed to activate at the post-purchase moment — highest loyalty intent — and it grew into the second-largest acquisition channel.</p>
+        <ul>
+          <li>Welcome series, post-purchase flow, win-back campaigns: all designed and shipped from scratch</li>
+          <li>Referral programme: became a standalone acquisition channel</li>
+          <li>Repeat purchase rate: 8% to 16.5% over 27 months</li>
+          <li>Organic traffic: 3.5x growth over the same period</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── EXECUTION ──────────────────────────────────────────────────────────── -->
+<div class="view" id="view-execution">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>Execution and Trade-offs</h2>
+      <p>What the work actually involved — the decisions that shaped the delivery, the crisis that tested it, and the calls I would make the same way again.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Key Trade-offs</div>
+
+  <table class="tradeoff-table">
+    <thead>
+      <tr><th>Decision</th><th>What I chose</th><th>What I rejected</th><th>Rationale</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mobile sequencing</strong></td>
+        <td>Full rebuild before retention layer launch <span class="badge badge-green">Chosen</span></td>
+        <td>Run lifecycle campaigns immediately, fix mobile in parallel</td>
+        <td>Retention investment capped by mobile conversion ceiling. Delay was correct given the dependency.</td>
+      </tr>
+      <tr>
+        <td><strong>CRO approach</strong></td>
+        <td>Structured programme with compounding learnings <span class="badge badge-green">Chosen</span></td>
+        <td>One-off experiments per feature</td>
+        <td>Single experiments produce single data points. A programme produces a model. Difference shows at 27 months, not 3.</td>
+      </tr>
+      <tr>
+        <td><strong>Feature prioritization</strong></td>
+        <td>Customization feature from ticket analysis <span class="badge badge-blue">Signal-driven</span></td>
+        <td>Roadmap assumption or stakeholder request</td>
+        <td>Quantitative data showed abandonment but not why. The signal lived in qualitative support data, not in dashboards.</td>
+      </tr>
+      <tr>
+        <td><strong>OMS design</strong></td>
+        <td>No-code automation (Make.com + Airtable) <span class="badge badge-green">Chosen</span></td>
+        <td>Custom development — 4x cost, 2x timeline</td>
+        <td>Shipped in 8 weeks. 94% automated order routing. Iteration capability retained in-house without engineering dependency.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:8px">The Crisis Test</div>
+  <div class="section-sub">Diwali 2024 — the system failed, then got rebuilt</div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🔥</div>
+      <h3>The failure</h3>
+      <p>Diwali 2024: 287 orders against a system built for 125. 25% cancellation rate. Viral complaints. Everything the retention programme had built was at risk of being undone in a single peak window. This was the highest-stakes moment of the 27-month build.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h3>The post-mortem</h3>
+      <p>Ran a structured post-mortem with the full team. Root cause: no capacity signal feeding into order intake, no quality threshold triggers. The system had been optimized for conversion but had no protection mechanism when volume exceeded operational capacity.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛡</div>
+      <h3>The redesign</h3>
+      <p>Shipped an automated circuit breaker system throttling order intake based on real-time capacity and quality signals. Diwali 2025: cancellation held at 6.4% on 120% higher revenue than the prior year on the same peak window.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── IMPACT ──────────────────────────────────────────────────────────────── -->
+<div class="view" id="view-impact">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>Impact Across 27 Months</h2>
+      <p>All metrics from verified Soulspiti product ownership, Jan 2024–Apr 2026.</p>
+    </div>
+  </div>
+
+  <div class="metric-strip">
+    <div class="metric-card">
+      <div class="mval">8% → 16.5%</div>
+      <div class="mlbl">Repeat purchase rate</div>
+      <div class="msub">Retention layer built from zero</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">+187%</div>
+      <div class="mlbl">Overall site conversion</div>
+      <div class="msub">0.67% to 1.92% over 27 months</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">+175%</div>
+      <div class="mlbl">Mobile conversion</div>
+      <div class="msub">0.4% to 1.1% in 2 weeks post-launch</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">15–20%</div>
+      <div class="mlbl">Cart recovery rate</div>
+      <div class="msub">3-touch abandoned cart sequence</div>
+    </div>
+  </div>
+
+  <div class="metric-strip">
+    <div class="metric-card">
+      <div class="mval">3.5x</div>
+      <div class="mlbl">Organic traffic growth</div>
+      <div class="msub">15K to 52K monthly visits</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">28%</div>
+      <div class="mlbl">Customization adoption</div>
+      <div class="msub">Surfaced via support ticket analysis</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">6.4%</div>
+      <div class="mlbl">Cancellation at peak (2025)</div>
+      <div class="msub">Down from 25% — on 120% higher revenue</div>
+    </div>
+    <div class="metric-card">
+      <div class="mval">-1% → 23.4%</div>
+      <div class="mlbl">Net margin</div>
+      <div class="msub">Revenue 7x, order volume 4x</div>
+    </div>
+  </div>
+
+  <div class="section-title">How This Maps to home24</div>
+  <div class="section-sub">What transfers directly, what scales differently, and where the gap is</div>
+
+  <table class="map-table">
+    <thead>
+      <tr><th>What I built at Soulspiti</th><th>home24 equivalent</th><th>Difference</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Lifecycle emails, win-back flows, referral programme — retention layer from zero</td>
+        <td>CRM tool ownership, loyalty strategy, CLV-linked retention programmes</td>
+        <td>home24 has existing infrastructure to extend; Soulspiti was 0-to-1</td>
+      </tr>
+      <tr>
+        <td>A/B testing programme — CRO across the full funnel, compounding over 27 months</td>
+        <td>Experimentation programme for personalization accuracy and app retention KPIs</td>
+        <td>Larger sample sizes at home24 — faster significance, richer signal</td>
+      </tr>
+      <tr>
+        <td>Mobile-first rebuild — mobile web, push notification strategy, onboarding flows</td>
+        <td>iOS and Android app roadmap, App Store Optimization, in-app engagement</td>
+        <td>Native app vs. mobile web — architecture differs, product logic is the same</td>
+      </tr>
+      <tr>
+        <td>Support ticket signal mining to surface hidden demand (customization feature)</td>
+        <td>Product discovery for personalization and loyalty feature prioritization</td>
+        <td>Directly applicable at any scale</td>
+      </tr>
+      <tr>
+        <td>AI/ML: predictive model integration at ABB (data science collaboration)</td>
+        <td>AI/ML strategic mindset for personalization engines and predictive loyalty models</td>
+        <td>ABB experience; applied in different domain</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── WHY ME ──────────────────────────────────────────────────────────────── -->
+<div class="view" id="view-why">
+  <div class="banner">
+    <div class="banner-text">
+      <h2>The Honest Fit Case</h2>
+      <p>What I bring, where it is directly transferable, and where the gap is.</p>
+    </div>
+  </div>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="wlabel">Retention and lifecycle</div>
+      <h4>Built the full retention layer from zero in an analogous category</h4>
+      <p>Welcome series, post-purchase flows, win-back campaigns, referral programme, cart recovery — all designed, scoped, shipped, and iterated on at Soulspiti. Repeat purchase rate from 8% to 16.5%. This is the core of what this role is asking for.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">CRO and experimentation</div>
+      <h4>Ran a structured A/B testing programme, not ad hoc experiments</h4>
+      <p>Compounding programme over 27 months, with documented learnings applied to successive tests. Site conversion from 0.67% to 1.92%. At Coinhaven, built the experimentation framework from scratch driving 300% MAU growth. Experimentation is a programme I know how to build and run.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Discovery</div>
+      <h4>Found the signal that dashboards did not show</h4>
+      <p>The customization feature came from manual support ticket analysis — 36% of customer inquiries containing requests that quantitative data would never surface. 28% adoption post-launch. This is the kind of discovery instinct this role requires.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Technical and AI/ML</div>
+      <h4>Worked directly with data scientists on predictive model integration</h4>
+      <p>At ABB, I collaborated with data scientists to design product logic for AI-enabled scheduling workflows ingesting real-time telemetry. I understand how to spec a product surface around ML output — which is exactly what personalization engine ownership requires.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Mobile</div>
+      <h4>Owned mobile product end to end — with one honest caveat</h4>
+      <p>Led the mobile rebuild at Soulspiti — mobile web, not native iOS/Android. The product logic is the same; the native app release cycle and App Store Optimization would be the steepest part of the learning curve. I am naming this rather than obscuring it.</p>
+    </div>
+    <div class="why-card">
+      <div class="wlabel">Location and availability</div>
+      <h4>Berlin-based, immediately available</h4>
+      <p>No relocation required. Home and living is a category I find genuinely interesting — the product decisions in this space have a physical presence in people's daily lives, and that shapes how I think about the customer journey.</p>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    <strong>What I would not claim:</strong> I have not owned a native iOS/Android app team or App Store Optimization. I have not owned a dedicated personalization engine at an e-commerce platform at scale. These are areas where I bring adjacent experience and directional instinct — not a direct track record. That is the honest version of the fit.
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>
