@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study — Vidhi Gupta × Tradebyte</title>
+<style>
+  :root {
+    --navy: #1F3864;
+    --teal: #2E75B6;
+    --teal-bg: #EBF3FB;
+    --orange: #C55A11;
+    --orange-bg: #FDF0E8;
+    --green: #375623;
+    --green-bg: #EAF4E2;
+    --gray-text: #444;
+    --gray-light: #F7F7F7;
+    --border: #D8D8D8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #EAEEF3; color: var(--gray-text); }
+
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 32px 44px 24px;
+  }
+  .header .pill {
+    background: var(--teal);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+  .header .sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 16px; }
+  .header .meta { display: flex; gap: 28px; flex-wrap: wrap; }
+  .header .meta span { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .header .meta strong { color: white; }
+
+  .tabs {
+    background: var(--navy);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 44px;
+    gap: 2px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 13px 18px;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .tab:hover { color: rgba(255,255,255,0.85); }
+  .tab.on { color: #fff; border-bottom-color: var(--teal); }
+
+  .body { max-width: 900px; margin: 0 auto; padding: 36px 20px 72px; }
+  .panel { display: none; }
+  .panel.on { display: block; }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 30px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--teal-bg);
+  }
+  .card h3 { font-size: 14px; font-weight: 700; color: var(--teal); margin: 18px 0 8px; }
+  .card p { font-size: 14px; line-height: 1.75; color: #555; margin-bottom: 10px; }
+  .card ul { padding-left: 18px; margin-bottom: 10px; }
+  .card li { font-size: 14px; line-height: 1.7; color: #555; margin-bottom: 5px; }
+
+  .note {
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .note.blue  { background: var(--teal-bg);   border-left: 4px solid var(--teal);   color: #1a3a5c; }
+  .note.amber { background: var(--orange-bg);  border-left: 4px solid var(--orange); color: #7b3500; }
+  .note.green { background: var(--green-bg);   border-left: 4px solid var(--green);  color: var(--green); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .stat { background: var(--gray-light); border: 1px solid var(--border); border-radius: 8px; padding: 18px 14px; text-align: center; }
+  .stat .n { font-size: 24px; font-weight: 800; color: var(--navy); }
+  .stat .l { font-size: 12px; color: #777; margin-top: 4px; line-height: 1.4; }
+  .stat.dark { background: var(--navy); border-color: var(--navy); }
+  .stat.dark .n { color: white; }
+  .stat.dark .l { color: rgba(255,255,255,0.65); }
+
+  table.cs { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+  table.cs th { background: var(--navy); color: white; padding: 9px 13px; text-align: left; }
+  table.cs td { padding: 9px 13px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; color: #555; }
+  table.cs tr:nth-child(even) td { background: var(--gray-light); }
+
+  .phase { position: relative; padding-left: 26px; margin-bottom: 24px; }
+  .phase::before { content: ''; position: absolute; left: 0; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+  .phase .label { font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+  .phase h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .phase p { font-size: 13px; color: #555; line-height: 1.7; }
+  .phase ul { padding-left: 16px; }
+  .phase li { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 4px; }
+
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
+  .g { background: #4caf50; }
+  .a { background: #ff9800; }
+
+  table.wm { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.wm th { background: var(--navy); color: white; padding: 9px 13px; text-align: left; }
+  table.wm td { padding: 9px 13px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; color: #555; }
+  table.wm tr:nth-child(even) td { background: var(--gray-light); }
+
+  @media (max-width:600px) {
+    .header { padding: 22px 18px 18px; }
+    .tabs { padding: 0 10px; }
+    .body { padding: 22px 14px 60px; }
+    .card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="pill">Case Study · Tradebyte Application</div>
+  <h1>From Documentation to Developer Activation:<br>Growing the TB.IO Ecosystem</h1>
+  <p class="sub">Vidhi Gupta — Senior PM Ecosystem candidate</p>
+  <div class="meta">
+    <span><strong>Company:</strong> Tradebyte Software GmbH (Zalando Group)</span>
+    <span><strong>Product:</strong> TB.IO — open developer platform on top of TB.One</span>
+    <span><strong>Note:</strong> Speculative case study based on publicly available information</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on"  onclick="show('context',this)">1. Context</button>
+  <button class="tab"     onclick="show('problem',this)">2. Problem</button>
+  <button class="tab"     onclick="show('discovery',this)">3. Discovery</button>
+  <button class="tab"     onclick="show('solution',this)">4. Solution</button>
+  <button class="tab"     onclick="show('metrics',this)">5. Metrics</button>
+  <button class="tab"     onclick="show('whyme',this)">6. Why Me</button>
+</div>
+
+<div class="body">
+
+<!-- ── 1. CONTEXT ── -->
+<div class="panel on" id="p-context">
+  <div class="card">
+    <h2>What Tradebyte does and where TB.IO fits</h2>
+    <p>Tradebyte's core product — TB.One — connects fashion and lifestyle brands to marketplaces. A brand signs up, maps its product data, and can sell on Zalando, Amazon, Otto, and 90+ other channels through one platform. Tradebyte has over 1,000 brand customers and 90+ marketplace connections.</p>
+    <p>TB.IO is the open platform layer on top of TB.One. Launched in April 2021, its goal is to let third-party developers — ERP providers, PIM vendors, logistics tools, shop systems — build their own connectors and apps that work inside TB.One. Instead of Tradebyte building every integration itself, partners build them.</p>
+    <p>The TB.IO App Store currently lists around 12 certified connectors: Shopify, Akeneo, JTL, Plentymarkets, Actindo, Sage 100, WooCommerce, and a few others.</p>
+    <div class="grid">
+      <div class="stat dark"><div class="n">1,000+</div><div class="l">brand customers on TB.One</div></div>
+      <div class="stat dark"><div class="n">90+</div><div class="l">marketplace connections</div></div>
+      <div class="stat dark"><div class="n">~12</div><div class="l">certified connectors in the App Store</div></div>
+      <div class="stat dark"><div class="n">2021</div><div class="l">year TB.IO opened to third parties</div></div>
+    </div>
+    <p style="font-size:12px;color:#999;">Sources: Tradebyte website, TB.IO App Store, TB.IO launch blog post (April 2021).</p>
+  </div>
+  <div class="card">
+    <h2>The Senior PM Ecosystem role</h2>
+    <p>This role owns the developer platform end-to-end: the roadmap, the developer experience, the App Store, the partner relationships, and the metrics that show whether the ecosystem is growing. The squad is small — PM, Engineering Manager, and engineers — but the scope is company-wide. Every brand customer is a potential beneficiary of each new certified connector.</p>
+  </div>
+</div>
+
+<!-- ── 2. PROBLEM ── -->
+<div class="panel" id="p-problem">
+  <div class="card">
+    <h2>The problem</h2>
+    <div class="note amber">
+      <strong>Core problem:</strong> TB.IO has the structural assets of an open platform — public APIs, documentation, an App Store — but the ecosystem is not growing at the pace the platform's scale should enable. Four years after launch, there are roughly 12 certified connectors for 1,000+ brand customers.
+    </div>
+    <h3>Why this matters to Tradebyte's business</h3>
+    <p>Tradebyte's core value to brand customers is reducing time-to-online across marketplaces. Every certified connector in the App Store reduces that time for brands using those tools. A stagnant App Store means brands that use Salesforce Commerce, SAP, or a niche ERP have to build their own custom integration — or wait for Tradebyte to build it. That is friction that can slow deal cycles and increase churn.</p>
+    <h3>What the problem is not</h3>
+    <p>The API works. The documentation exists. Tradebyte is not starting from zero. The problem is specifically that third-party developers are not activating and building certified connectors at the rate you would expect given the size of the customer base.</p>
+    <h3>Two things I do not know yet</h3>
+    <p>This case study is based on public information. Before going further in a real role, I would need to understand:</p>
+    <ul>
+      <li>How many developers have registered on TB.IO but not completed a certified connector?</li>
+      <li>What does Tradebyte's internal data show as the top-requested integrations from brand customers?</li>
+    </ul>
+    <p>Both of those answers would change the prioritization significantly.</p>
+  </div>
+</div>
+
+<!-- ── 3. DISCOVERY ── -->
+<div class="panel" id="p-discovery">
+  <div class="card">
+    <h2>How I would investigate this</h2>
+    <p>Before proposing any solution, I would run discovery across three areas. My goal is to understand where and why developers are dropping off.</p>
+
+    <h3>Area 1 — The developer journey, step by step</h3>
+    <p>Every developer who tries to build on TB.IO goes through roughly the same stages. I would instrument each one and find where the largest drop-offs happen.</p>
+    <table class="cs">
+      <thead><tr><th>Stage</th><th>What I would measure</th><th>Hypothesis</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Finds TB.IO</strong></td><td>Where developers come from — referral from Tradebyte team, Google, partner network</td><td>Most come from direct referral, not organic discovery. TB.IO is not easily findable by developers who don't already know Tradebyte.</td></tr>
+        <tr><td><strong>Reads the docs</strong></td><td>Time on documentation pages, exit rate per section</td><td>The XML-based API format creates friction for developers who expect JSON/REST-first APIs. Some drop here.</td></tr>
+        <tr><td><strong>Makes first API call</strong></td><td>Time from registration to first successful call</td><td>Getting to a working first call takes more than a day. There is no guided "get started in 60 minutes" path.</td></tr>
+        <tr><td><strong>Starts certification</strong></td><td>How many developers start the certification process</td><td>The certification criteria are not clear upfront. Developers cannot estimate the effort before they commit.</td></tr>
+        <tr><td><strong>Lists in App Store</strong></td><td>Certified connectors published per quarter</td><td>Certification takes longer than expected, and some developers abandon before finishing.</td></tr>
+        <tr><td><strong>Gets customers</strong></td><td>How brands discover and adopt App Store connectors</td><td>There is no clear commercial model published. Developers don't know if building a connector is worth their time commercially.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Area 2 — What brand customers are actually asking for</h3>
+    <div class="note blue">
+      <strong>My hypothesis:</strong> The demand signal already exists inside Tradebyte — in Success Manager notes and support tickets — but it is not visible to developers. A developer considering whether to build a Salesforce Commerce connector has no way to see that 40 brand customers have asked for it.
+    </div>
+    <p>I would do a structured review of the last 12 months of Success Manager notes and brand customer requests to extract: which integrations come up most often, which gaps are actively costing time-to-online today, and which are blocking deals.</p>
+
+    <h3>Area 3 — Interviews with existing certified partners</h3>
+    <p>FATCHIP was the first certified partner on TB.IO and helped design it. I would interview them and 3–4 other certified partners and ask one question: if you were onboarding a developer to TB.IO today from scratch, what would you change about the process?</p>
+    <p>I would also talk to 3–5 developers who started a connector but did not finish — the drop-off data matters more than the success stories.</p>
+  </div>
+</div>
+
+<!-- ── 4. SOLUTION ── -->
+<div class="panel" id="p-solution">
+  <div class="card">
+    <h2>What I would build, and in what order</h2>
+    <p>Based on the discovery above, my working hypothesis is that the problem has three layers, each needing a different fix. I would sequence them by impact and by how much we already know.</p>
+
+    <div class="phase">
+      <div class="label">First · Months 1–3</div>
+      <h4>Make it easier to get started</h4>
+      <p>The biggest drop-off is probably in the first 24–48 hours. A developer who cannot make a successful API call quickly will move on. Before any ecosystem strategy, I would fix the onboarding experience:</p>
+      <ul>
+        <li>A "get started in 60 minutes" guide with working sandbox credentials and a sample connector for one real use case</li>
+        <li>Certification criteria published upfront — effort, timeline, and what success looks like — so developers can commit with confidence</li>
+        <li>A clear commercial model: how connectors are listed, how brand customers find them, what commercial arrangement is possible</li>
+      </ul>
+      <p style="margin-top:8px;">None of this requires engineering. It is product and documentation work. But it unblocks everything else.</p>
+    </div>
+
+    <div class="phase">
+      <div class="label">Second · Months 4–9</div>
+      <h4>Show developers where the demand is</h4>
+      <p>The single highest-leverage change I would make: surface the demand signal that already exists inside Tradebyte. A "most requested integrations" board on TB.IO, updated from Success Manager data, would give developers proof that their work has a ready market before they start building.</p>
+      <ul>
+        <li>A public list of the top-requested integrations, with a rough indication of how many brands have asked (even as a range like "10–20 brands")</li>
+        <li>A developer-facing view of App Store connector usage — how many brands have installed each certified connector — so developers can see that adoption actually happens</li>
+      </ul>
+    </div>
+
+    <div class="phase">
+      <div class="label">Third · Months 10–18</div>
+      <h4>Build the flywheel</h4>
+      <p>Once activation and demand signal are working, the ecosystem can start to compound. More certified connectors reduce time-to-online for brands, which is Tradebyte's core commercial value, which makes the platform more attractive to new brands, which creates more demand for connectors.</p>
+      <ul>
+        <li>A developer partner program with clear tiers — what you get for being certified, and what you get for hitting adoption milestones</li>
+        <li>An annual ecosystem report: how many developers, how many connectors, how much time-to-online brands are saving. This signals to larger system integrators that the ecosystem is real and worth investing in.</li>
+        <li>AI-assisted connector scaffolding — starter code templates that reduce the time to first working connector from weeks to days</li>
+      </ul>
+    </div>
+
+    <h3>What I would not do</h3>
+    <div class="note amber">
+      I would not optimize for connector count as a number. Ten well-adopted connectors are worth more than fifty that nobody uses. Every prioritization decision would be anchored to: does this reduce time-to-online for brand customers?
+    </div>
+  </div>
+</div>
+
+<!-- ── 5. METRICS ── -->
+<div class="panel" id="p-metrics">
+  <div class="card">
+    <h2>How I would measure success</h2>
+    <p>One metric per stage of the developer journey. The goal is to catch problems early — a drop in activation rate is visible weeks before it shows up as a stagnant App Store.</p>
+    <table class="cs">
+      <thead><tr><th>What I am measuring</th><th>Why it matters</th><th>Target (indicative)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Time to first API call</strong><br>For new developers</td><td>Fastest signal of whether onboarding is working</td><td>Under 24 hours</td></tr>
+        <tr><td><strong>Activation rate</strong><br>Registered → first API call</td><td>Measures onboarding quality</td><td>Over 60%</td></tr>
+        <tr><td><strong>Certification completion rate</strong><br>Started → listed in App Store</td><td>Measures whether certification is a reasonable ask</td><td>Over 50%</td></tr>
+        <tr><td><strong>New certified connectors per quarter</strong></td><td>The ecosystem growth metric</td><td>[ADD: baseline needed first]</td></tr>
+        <tr><td><strong>Connector adoption by brand customers</strong><br>Installs per listed connector</td><td>Whether connectors are actually useful, not just listed</td><td>At least 10 brand installs per certified connector within 6 months</td></tr>
+        <tr><td><strong>Time-to-online reduction</strong><br>For brands using App Store connectors vs. custom build</td><td>The metric that connects developer ecosystem to Tradebyte's core value</td><td>30% faster than equivalent custom integration</td></tr>
+      </tbody>
+    </table>
+    <h3>The metric I would report to leadership</h3>
+    <div class="note green">
+      <strong>North Star:</strong> Percentage of new brand-to-marketplace activations where an App Store connector reduced integration time vs. custom development. If this grows quarter over quarter, the ecosystem is doing its job.
+    </div>
+    <p style="font-size:12px;color:#999;margin-top:8px;">Targets above are indicative. Baselines would be set in the first 60 days after seeing actual activation funnel data.</p>
+  </div>
+</div>
+
+<!-- ── 6. WHY ME ── -->
+<div class="panel" id="p-whyme">
+  <div class="card">
+    <h2>Where my experience maps to this role — honestly</h2>
+    <table class="wm">
+      <thead><tr><th>What the role needs</th><th>My assessment</th><th>Where it comes from</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Defining API contracts and integration specs as a PM</strong></td>
+          <td><span class="dot g"></span>Direct experience</td>
+          <td>Coinhaven: wrote integration specs for Sumsub (KYC) and Twilio (MFA) before engineering started. Soulspiti: owned PayU and Shiprocket integration specs and go-live criteria.</td>
+        </tr>
+        <tr>
+          <td><strong>Auth/authz and permission model design</strong></td>
+          <td><span class="dot g"></span>Direct experience</td>
+          <td>Coinhaven: designed RBAC, MFA flow, session management, and permission scopes as PM-owned specs. Built admin tooling so compliance could manage access without engineering.</td>
+        </tr>
+        <tr>
+          <td><strong>Developer-facing tooling</strong></td>
+          <td><span class="dot g"></span>Direct proxy</td>
+          <td>Coinhaven admin panel was used by the compliance team the same way a TB.IO App Store developer would use an admin console. I defined what it needed to do, how permissions worked, and what the audit trail looked like.</td>
+        </tr>
+        <tr>
+          <td><strong>Technical fluency</strong></td>
+          <td><span class="dot g"></span>Genuine — B.Tech CS, 4 years as a software engineer</td>
+          <td>Can read code, understand API responses, and hold architectural discussions without a translator. Daily user of Cursor, Claude Code, n8n.</td>
+        </tr>
+        <tr>
+          <td><strong>Managing enterprise stakeholders</strong></td>
+          <td><span class="dot g"></span>Direct experience</td>
+          <td>ABB: aligned C-suite, data engineers, and Amazon/UPS operations directors on the same product in the same sprint.</td>
+        </tr>
+        <tr>
+          <td><strong>Public developer platform PM</strong></td>
+          <td><span class="dot a"></span>Adjacent, not direct</td>
+          <td>I have not owned a public developer platform product at this scale. The skills are there; the specific context is not. I would invest in learning the nuances of open platform strategy and developer community management in the first 90 days.</td>
+        </tr>
+        <tr>
+          <td><strong>Fashion / e-commerce domain depth</strong></td>
+          <td><span class="dot a"></span>Marketplace yes, fashion-specific no</td>
+          <td>Soulspiti is an e-commerce marketplace — I understand supply side, demand side, and operations. Fashion brand-to-marketplace data flows specifically are something I would learn on the job.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note blue" style="margin-top:20px;">
+      <strong>The short version:</strong> The core skills this role needs — defining integration contracts, designing permission models, working with engineering on API product decisions, and connecting developer activity to business outcomes — are things I have done. I have not done them on a public platform at Tradebyte's scale. That is the gap, and I am not hiding it.
+    </div>
+  </div>
+</div>
+
+</div><!-- end body -->
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('p-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+</script>
+</body>
+</html>
